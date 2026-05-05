@@ -1,5 +1,6 @@
 #pragma once
 #include "ui_element.h"
+#include "text.h"
 
 #define UI_MAX_ELEMENTS 128
 
@@ -13,6 +14,19 @@ typedef struct {
     UIActionFn fn;
 } UIAction;
 
+typedef struct {
+    const Charset *charset;
+    C2D_SpriteSheet *sheet;    
+} LabelFont;
+
+enum Fonts {
+    FONT_PUSAB,
+    FONT_CHAT,
+    FONT_GOLD_PUSAB,
+
+    NUM_FONTS
+};
+
 extern C2D_SpriteSheet ui_sheet;
 extern C2D_SpriteSheet ui_2_sheet;
 extern C2D_SpriteSheet bigFont_sheet;
@@ -21,6 +35,8 @@ extern C2D_SpriteSheet goldFont_sheet;
 extern C2D_SpriteSheet window_sheet;
 extern C2D_SpriteSheet bg_gradient_sheet;
 extern C2D_SpriteSheet bar_sheet;
+
+extern const LabelFont fonts[NUM_FONTS];
 
 void ui_assets_init();
 

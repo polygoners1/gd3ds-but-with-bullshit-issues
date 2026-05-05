@@ -58,6 +58,13 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
     
     float offset = 0;
 
+    float height = HEIGHT_OFFSET;
+
+    const Glyph *aCharacter = get_glyph(font, 'A');
+    if (aCharacter) {
+        height = aCharacter->height * HEIGHT_OFFSET_MULT;
+    }
+
     for (int i = 0; i < size; i++) {
         const Glyph *character = get_glyph(font, tmp[i]);
         
@@ -71,7 +78,7 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
             int index = character->spriteIndex;
 
             float final_x = x + offset + xoffset - length * alignment;
-            float final_y = y + yoffset - (int)(19 * scale);
+            float final_y = y + yoffset - (int)(height * scale);
 
             final_x = (scale == 1.0f) ? roundf(final_x) : final_x;
             final_y = (scale == 1.0f) ? roundf(final_y) : final_y;

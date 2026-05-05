@@ -12,28 +12,6 @@
 
 #include "main.h"
 
-typedef struct {
-    const Charset *charset;
-    C2D_SpriteSheet *sheet;    
-} ButtonFont;
-
-static ButtonFont fonts[] = {
-    {
-        .charset = &bigFont_fontCharset,
-        .sheet = &bigFont_sheet
-    },
-    {
-        .charset = &chatFont_fontCharset,
-        .sheet = &chatFont_sheet
-    },
-    {
-        .charset = &goldFont_fontCharset,
-        .sheet = &goldFont_sheet
-    }
-};
-
-#define NUM_FONTS (sizeof(fonts) / sizeof(ButtonFont))
-
 static void ui_button_update(UIElement* e, UIInput* touch) {
     bool pressedTouch = hidKeysDown() & KEY_TOUCH;
     bool releasedTouch = hidKeysUp() & KEY_TOUCH;
@@ -95,7 +73,7 @@ static void ui_button_draw(UIElement* e) {
     // Set to pusab if invalid
     if (font_id >= NUM_FONTS) font_id = 0;
 
-    ButtonFont *font = &fonts[font_id];
+    const LabelFont *font = &fonts[font_id];
 
     float scale = e->button.hoverScale;
     float text_scale = e->button.textScale;

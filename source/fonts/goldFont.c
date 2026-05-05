@@ -1,4 +1,5 @@
 #include "text.h"
+
 const Glyph goldFont_fontGlyphs[96] = {
     {32, 123, 203, 0, 0, 0, 28, 11, -1},
     {33, 37, 57, 16, 25, 0, 4, 9, 0},

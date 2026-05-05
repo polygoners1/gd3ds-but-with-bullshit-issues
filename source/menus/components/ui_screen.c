@@ -24,6 +24,11 @@
 
 #include "graphics.h"
 
+#include "text.h"
+#include "fonts/bigFont.h"
+#include "fonts/chatFont.h"
+#include "fonts/goldFont.h"
+
 C2D_SpriteSheet ui_sheet;
 C2D_SpriteSheet ui_2_sheet;
 C2D_SpriteSheet window_sheet;
@@ -32,6 +37,21 @@ C2D_SpriteSheet chatFont_sheet;
 C2D_SpriteSheet goldFont_sheet;
 C2D_SpriteSheet bg_gradient_sheet;
 C2D_SpriteSheet bar_sheet;
+
+const LabelFont fonts[NUM_FONTS] = {
+    {
+        .charset = &bigFont_fontCharset,
+        .sheet = &bigFont_sheet
+    },
+    {
+        .charset = &chatFont_fontCharset,
+        .sheet = &chatFont_sheet
+    },
+    {
+        .charset = &goldFont_fontCharset,
+        .sheet = &goldFont_sheet
+    }
+};
 
 void ui_assets_init() {
     ui_sheet = C2D_SpriteSheetLoad("romfs:/gfx/ui.t3x");

@@ -1,34 +1,7 @@
 #include "ui_element.h"
 #include <citro2d.h>
 #include "ui_image.h"
-#include "text.h"
-#include "fonts/bigFont.h"
-#include "fonts/chatFont.h"
-#include "fonts/goldFont.h"
 #include "ui_screen.h"
-
-
-typedef struct {
-    const Charset *charset;
-    C2D_SpriteSheet *sheet;    
-} LabelFont;
-
-static LabelFont fonts[] = {
-    {
-        .charset = &bigFont_fontCharset,
-        .sheet = &bigFont_sheet
-    },
-    {
-        .charset = &chatFont_fontCharset,
-        .sheet = &chatFont_sheet
-    },
-    {
-        .charset = &goldFont_fontCharset,
-        .sheet = &goldFont_sheet
-    }
-};
-
-#define NUM_FONTS (sizeof(fonts) / sizeof(LabelFont))
 
 static void ui_label_update(UIElement* e, UIInput* touch) {
     // Do absolutely nothing
@@ -42,7 +15,7 @@ static void ui_label_draw(UIElement* e) {
     // Set to pusab if invalid
     if (font_id >= NUM_FONTS) font_id = 0;
 
-    LabelFont *font = &fonts[font_id];
+    const LabelFont *font = &fonts[font_id];
     draw_text(font->charset, font->sheet, e->x, e->y, e->label.scale, e->label.alignment, "%s", e->label.text);
 }
 

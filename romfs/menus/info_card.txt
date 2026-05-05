@@ -5,9 +5,9 @@ button x=35 y=65 id=31 scale=0.8 action="exit"
 
 label x=160 y=90 font=2 text="Info" scale=0.9 align=CENTER
 
-label x=160 y=125 font=1 text="" scale=0.8 align=CENTER tag="content"
-label x=160 y=118 font=1 text="" scale=0.8 align=CENTER tag="content1"
-label x=160 y=132 font=1 text="" scale=0.8 align=CENTER tag="content2"
+label x=160 y=117 font=1 text="" scale=0.8 align=CENTER tag="content"
+label x=160 y=110 font=1 text="" scale=0.8 align=CENTER tag="content1"
+label x=160 y=124 font=1 text="" scale=0.8 align=CENTER tag="content2"
 
 windowbutton x=160 y=153 style=5 text="OK" w=52px h=30px scale=0.8 action="exit" font=2
 

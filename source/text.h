@@ -14,6 +14,8 @@ typedef struct {
     short spriteIndex;
 } Glyph;
 
+#define HEIGHT_OFFSET (20.f)
+#define HEIGHT_OFFSET_MULT (HEIGHT_OFFSET / 29)
 
 typedef struct {
     const Glyph* glyphs;
