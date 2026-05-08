@@ -80,14 +80,18 @@ bool is_citra() {
 
 void no_dsp_firmware(void) {
     consoleInit(GFX_TOP, NULL);
-    printf("\x1b[01;00H/////////////////FATAL///ERROR////////////////////");
-    printf("\x1b[03;00HNDSP could not be initalized.");
+    printf("\x1b[01;00H///////////////////FATAL///ERROR//////////////////");
+    printf("\x1b[03;00HNDSP could not be initalized!");
     printf("\x1b[05;00HThis is probably because your dspfirm is missing.");
-    printf("\x1b[07;00HExtract the ndsp firmware (dspfirm.cdc) to");
-    printf("\x1b[09;00Hsdmc:/3ds/ on your sd card.");
-    printf("\x1b[11;00HCitra/Azahar users only need the file to be there,");
-    printf("\x1b[13;00Hit can be empty.");
-    printf("\x1b[15;00HPress start to exit.");
+    printf("\x1b[07;00HFor 3DS users, open the Luma menu, go to");
+    printf("\x1b[08;00Hmiscellaneous options and press \"Dump DSP");
+    printf("\x1b[09;00Hfirmware\".");
+    printf("\x1b[11;00HFor Citra/Azahar users, open your emulator folder");
+    printf("\x1b[12;00Hand create a file named \"dspfirm.cdc\" in ");
+    printf("\x1b[13;00H/sdmc/3ds/. You only need the file to be there, ");
+    printf("\x1b[14;00Hit can be empty for all the emulator cares.");
+    printf("\x1b[16;00HFor more information, check the GitHub.");
+    printf("\x1b[18;00HPress start to exit.");
     printf("\x1b[30;00H//////////////////////////////////////////////////");
     while (aptMainLoop()) {
         gspWaitForVBlank();
@@ -711,27 +715,30 @@ void game_loop() {
             if (state.profiling) {
                 float processingTime = ((ticks / CPU_TICKS_PER_MSEC)) * 6;
                 float drawingTime = C3D_GetDrawingTime() * 6;
+                float fps = 1 / delta;
+                if (fps > 60) fps = 60;
 
                 #define DEBUG_TEXT_SCALE 0.4f
                 
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 6,  DEBUG_TEXT_SCALE, 0, "CPU: %6.2f%% (%6.2f%% %6.2f%%)", (C3D_GetProcessingTime() * 6) + processingTime, C3D_GetProcessingTime() * 6, processingTime);
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 18, DEBUG_TEXT_SCALE, 0, "GPU: %6.2f%%", drawingTime);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 30, DEBUG_TEXT_SCALE, 0, "Linear free: %d", linearSpaceFree());
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 30, DEBUG_TEXT_SCALE, 0, "CMDBuf: %6.2f%%", C3D_GetCmdBufUsage()*100.0f);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 30, DEBUG_TEXT_SCALE, 0, "FPS: %6.1f", fps);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 42, DEBUG_TEXT_SCALE, 0, "Linear free: %d", linearSpaceFree());
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 42, DEBUG_TEXT_SCALE, 0, "CMDBuf: %6.2f%%", C3D_GetCmdBufUsage()*100.0f);
 
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 42,  DEBUG_TEXT_SCALE, 0, "%d steps", steps);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 66,  DEBUG_TEXT_SCALE, 0, "%d steps", steps);
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 54,  DEBUG_TEXT_SCALE, 0, "Particle: %6.2f%%", particle_calc_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 66,  DEBUG_TEXT_SCALE, 0, "Triggers: %6.2f%%", triggers_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 78,  DEBUG_TEXT_SCALE, 0, "Collision %d/%d", number_of_collisions, number_of_collisions_checks);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 90,  DEBUG_TEXT_SCALE, 0, "Physics: %6.2f%%", physics_calc_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 102, DEBUG_TEXT_SCALE, 0, " - Coll: %6.2f%%", collision_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 114, DEBUG_TEXT_SCALE, 0, " - Play: %6.2f%%", player_time * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 126, DEBUG_TEXT_SCALE, 0, " - Hndl: %6.2f%%", handle_player_time * 6);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 78,  DEBUG_TEXT_SCALE, 0, "Triggers: %6.2f%%", triggers_time * 6);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 90,  DEBUG_TEXT_SCALE, 0, "Collision %d/%d", number_of_collisions, number_of_collisions_checks);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 102,  DEBUG_TEXT_SCALE, 0, "Physics: %6.2f%%", physics_calc_time * 6);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 114, DEBUG_TEXT_SCALE, 0, " - Coll: %6.2f%%", collision_time * 6);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 126, DEBUG_TEXT_SCALE, 0, " - Play: %6.2f%%", player_time * 6);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 138, DEBUG_TEXT_SCALE, 0, " - Hndl: %6.2f%%", handle_player_time * 6);
 
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   42,  DEBUG_TEXT_SCALE, 0, "SprDraw:  %6.2f%%", (sprite_drawing_time) * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   54,  DEBUG_TEXT_SCALE, 0, " - Creating: %6.2f%%", (object_creating_time) * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   66,  DEBUG_TEXT_SCALE, 0, " - Sorting:  %6.2f%%", (object_sorting_time) * 6);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   90,  DEBUG_TEXT_SCALE, 0, "Drawing:  %6.2f%%", (object_drawing_time) * 6);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   54,  DEBUG_TEXT_SCALE, 0, "SprDraw:  %6.2f%%", (sprite_drawing_time) * 6);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   66,  DEBUG_TEXT_SCALE, 0, " - Creating: %6.2f%%", (object_creating_time) * 6);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   78,  DEBUG_TEXT_SCALE, 0, " - Sorting:  %6.2f%%", (object_sorting_time) * 6);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   102,  DEBUG_TEXT_SCALE, 0, "Drawing:  %6.2f%%", (object_drawing_time) * 6);
             }
 
             if (state.noclip) {
