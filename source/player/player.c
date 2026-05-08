@@ -456,7 +456,7 @@ void wave_gamemode(Player *player) {
 void run_player(Player *player) {
     float scale = (player->mini) ? 0.6f : 1.f;
     trail->stroke = 10.f * scale;
-    
+
     if (!player->left_ground) {
         // Ground
         if (getGroundBottom(player) <= state.ground_y) {
@@ -529,7 +529,7 @@ void run_player(Player *player) {
             MotionTrail_ResumeStroke(trail);
             wave_gamemode(player);
             break;
-    }
+    } 
     
     player->time_since_ground += STEPS_DT;
 
@@ -619,6 +619,9 @@ void run_player(Player *player) {
     
     if (player->slope_slide_coyote_time) {
         player->slope_slide_coyote_time--;
+
+        snap_player_to_slope(player->coyote_slope.slope_id, player);
+
         if (!player->slope_slide_coyote_time) {
             player->coyote_slope.slope_id = -1;
             player->coyote_slope.elapsed = 0;

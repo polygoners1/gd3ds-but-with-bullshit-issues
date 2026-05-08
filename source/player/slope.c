@@ -223,6 +223,8 @@ void slope_calc(int obj, Player *player) {
         if (obj_gravTop(player, obj) <= grav(player, player->y) || getLeft(player) - obj_getRight(obj) > 0) {
             float vel = -falls[state.speed] * ((float) objects.height[obj] / objects.width[obj]);
             player->new_vel_y = vel;
+            player->coyote_slope = player->slope_data;
+            player->slope_slide_coyote_time = 4;
             push_player_action(clear_slope_data);
         }
     } else if (orientation == ORIENT_UD_UP) { // Upside down - up
@@ -292,6 +294,8 @@ void slope_calc(int obj, Player *player) {
         if (obj_gravTop(player, obj) <= grav(player, player->y) || getLeft(player) - obj_getRight(obj) > 0) {
             float vel = falls[state.speed] * ((float) objects.height[obj] / objects.width[obj]);
             player->new_vel_y = vel;
+            player->coyote_slope = player->slope_data;
+            player->slope_slide_coyote_time = 4;
             push_player_action(clear_slope_data);
         }
     }
