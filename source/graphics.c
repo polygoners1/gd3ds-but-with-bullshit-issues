@@ -54,6 +54,7 @@ SpriteTemplate sprite_templates[GAME_OBJECT_COUNT]; // global cache
 
 uint8_t opacityLUT[LUT_SIZE];
 
+// GD opacity is not linear. For speed this makes a lookup table for fast access
 void make_opacity_lut() {
     for (int i = 0; i < LUT_SIZE; i++) {
         float x = (float)i / (LUT_SIZE - 1);  // normalize to [0,1]
@@ -78,11 +79,13 @@ float get_opacity(float opacity) {
 }
 
 static C2D_SpriteSheet *get_sprite_sheet(int index, int *rel_index) {
+    // Check if index belongs to spritesheet 1 (most objects)
     if (index < SPRITESHEET2_START) {
         *rel_index = index;
         return &spriteSheet;
     }
 
+    // Return spritesheet 2 (portals)
     *rel_index = index - SPRITESHEET2_START;
     return &spriteSheet2;
 }
@@ -101,7 +104,6 @@ void update_player_colors() {
     Color p2 = get_color_abgr8(colors[selected_p2]);
     Color glow = get_color_abgr8(colors[selected_glow]);
 
-
     set_player_colors(p1, p2, glow);
 }
 
@@ -111,21 +113,30 @@ Color get_white_if_black(Color color) {
     return color;
 }
 
+// Gets p1 color accounting for p1 and p2 being black
 Color get_p2_if_black(Color color) {
+    // Check if p1 is black
     if ((color.r | color.g | color.b) == 0) {
+        // If p1 is also black, return white
         if ((p2_color.r | p2_color.g | p2_color.b) == 0) {
             return white;
         }
+        // Else just return p2
         return p2_color;
     }
     
     return color;
 }
+
+// Gets p2 color accounting for p1 and p2 being black
 Color get_p1_if_black(Color color) {
+    // Check if p2 is black
     if ((color.r | color.g | color.b) == 0) {
+        // If p1 is also black, return white
         if ((p1_color.r | p1_color.g | p1_color.b) == 0) {
             return white;
         }
+        // Else return p1
         return p1_color;
     }
     
@@ -138,6 +149,7 @@ void set_player_colors(Color p1, Color p2, Color glow) {
     glow_color = glow;
 }
 
+// This might make sprite making faster, im not sure thought
 void cache_all_sprites() {
     for (int id = 0; id < GAME_OBJECT_COUNT; id++) {
         const GameObject* obj = &game_objects[id];
@@ -187,8 +199,7 @@ void free_cached_sprites() {
     }
 }
 
-float mirror_angle(float angle, bool hflip, bool vflip)
-{
+float mirror_angle(float angle, bool hflip, bool vflip) {
     if (hflip && vflip) {
         angle += 180.0f;
     } else if (hflip) {
@@ -200,6 +211,7 @@ float mirror_angle(float angle, bool hflip, bool vflip)
     return normalize_angle(angle);
 }
 
+// Returns true if the object is a invisible object
 bool object_fades(int obj) {
     switch (objects.id[obj]) {
         case 144:
@@ -226,13 +238,16 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
     if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
     else if (col_type == COLOR_TYPE_WHITE) col_channel = -1;
     else {
+        // Check for the presence of 1.9 color channel
         if (objects.v1p9_col_channel[obj]) {
+            // If pulserods, use base instead of detail
             if (obj_id >= 15 && obj_id <= 17) {
                 if (col_type == COLOR_TYPE_BASE) col_channel = objects.v1p9_col_channel[obj];
             } else {
                 if (col_type == COLOR_TYPE_DETAIL) col_channel = objects.v1p9_col_channel[obj];
             }
         } else {
+            // 2.0 color channels, here for 1.9 levels that got updated in 2.0 (and for making 1.9 levels in 2.2)
             if (objects.col_channel[obj]) {
                 if (col_type == COLOR_TYPE_BASE) {
                     col_channel = objects.col_channel[obj];
@@ -252,6 +267,8 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
     }
     return col_channel;
 }
+
+// Baby's first reverse engineered function
 
 const float leftFadeBound = (SCREEN_WIDTH_AREA/2) - 75.f;
 const float leftFadeWidth = leftFadeBound - 30;
@@ -332,6 +349,7 @@ float get_fading_obj_fade(int obj, float right_edge, float *glow_out) {
     return 1.f;
 }
 
+// Get the glow color channel
 int get_glow_channel(int obj) {
     if (object_fades(obj)) {
         return CHANNEL_INVISIBLE_GLOW;
@@ -389,21 +407,21 @@ int get_glow_channel(int obj) {
     }
     return CHANNEL_OBJ_BLENDING;
 }
-
+// Spike ground spikes
 const int obj_9_random_layers[4] = {
     586,
     590,
     591,
     590
 };
-
+// Bush ground spikes (found in toe)
 const int obj_135_random_layers[4] = {
     611,
     612,
     613,
     614
 };
-
+// Some objects have a randomized texture at level load, get those
 int get_obj_random_layer(int obj, int id) {
     int tex = game_objects[id].texture;
     switch (id) {
@@ -420,6 +438,7 @@ int get_obj_random_layer(int obj, int id) {
     return -1;
 }
 
+// Deco saws rotate slower than normal saws. If not a saw, rotation speed is just 0
 float get_rotation_speed(int id) {
     switch (id) {
         case 88: 
@@ -473,7 +492,7 @@ float get_rotation_speed(int id) {
     return 0.f;
 }
 
-
+// Map amplitude pulsing to ranges
 float get_object_pulse(float amplitude, int id, int layer) {
     switch (id) {
         case 36:
@@ -541,7 +560,7 @@ void spawn_object_at(
 
     if (sprite_count >= MAX_SPRITES - 1) return;
 
-    // Skip if no texture
+    // Spawn parent, skip if no texture
     if (obj->texture >= 0) {
         SpriteObject *vo = &viewable_objects[sprite_count];
 
@@ -602,7 +621,7 @@ void spawn_object_at(
         sprite_count++;
     }
 
-    // Render children
+    // Spawn children
     for (int i = 0; i < obj->child_count; i++) {
         const ChildSprite* c = &obj->children[i];
         
@@ -653,6 +672,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 {
     const int obj = s->obj;
 
+    // Player sprite is -1 so handle it there
     if (obj == -1) {
         return ((5 + 8) << 18) | (0 << 16) | (0 << 8) | 0;
     }
@@ -667,15 +687,15 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 
     bool blending = col_channel > 0 && (channels[col_channel].blending ^ ((zlayer & 1) == 0));
 
-    if (s->layer == 1) {
-        zlayer--;
-    } else if (blending) {
+    // If layer is a glow layer or it has blending, decrement it
+    if (s->layer == 1 || blending) {
         zlayer--;
     }
 
     int child_z = 0;
     int tex = game_obj->texture;
 
+    // If layer is a glow layer, it does something for sure
     if (s->layer > 1) {
         const ChildSprite *child = &game_obj->children[s->layer - 2];
         child_z = child->z - 1;
@@ -683,6 +703,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
         zlayer += child->z_layer_offset;
     }
     
+    // Glow layers always use spritesheet 2 (only for sorting purposes)
     int sheet;
     if (s->layer == 1) {
         sheet = 2;
@@ -699,6 +720,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 
     s->zlayer = zlayer;
 
+    // Pack all variables into a nice 32 bit variable
     uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 6 bits
     uint32_t zb = (uint32_t)(blending);       // fits in 1 bit
     uint32_t zs = (uint32_t)(sheet);          // fits in 1 bit
@@ -711,8 +733,8 @@ static inline uint32_t make_sort_key(SpriteObject *s)
 #define VIEW_OBJECTS (12 * 6)
 #define INSERTION_SORT_THRESHOLD 16
 
-void sort_viewable_objects(SpriteObject **objects, int count)
-{
+// Insertion sort moment
+void sort_viewable_objects(SpriteObject **objects, int count) {
     if (count <= 1) return;
 
     for (int i = 0; i < count; i++) {
@@ -724,7 +746,7 @@ void sort_viewable_objects(SpriteObject **objects, int count)
     SortItem *dst = buf_b;
 
     for (int pass = 0; pass < 3; pass++) {
-        uint16_t buckets[256] = {0};
+        uint16_t buckets[256] = {0}; // Crum buckets, speak to da weeb, began duh uh oh oh, oh, oh oh oh oh wiguwiguwi
         int shift = pass * 8;
 
         for (int i = 0; i < count; i++) {
@@ -792,6 +814,7 @@ float get_out_scale_fade(float x, int right_edge) {
     return 1 + ((fade / 255.f) / 2);
 }
 
+// Some objects dont change opacity on fade transitions
 int get_obj_opacity(int obj, float x) {
     int opacity = obj_edge_fade(x, SCREEN_WIDTH / SCALE);
     bool blending;
@@ -833,7 +856,7 @@ int get_obj_opacity(int obj, float x) {
     return opacity;
 }
 
-
+// Handle complex fading transitions
 void handle_special_fading(int obj, float calc_x, float calc_y) {
     switch (current_fading_effect) {
         case FADE_INWARDS:
@@ -933,6 +956,7 @@ void get_fade_vars(int obj, float x, int *fade_x, int *fade_y, float *fade_scale
 }
 
 void change_blending(bool blending) {
+    // If changing blending to the same state, do nothing a state change its not worth it
     if (blending == blending_state) return;
 
     if (blending) {
@@ -1051,6 +1075,7 @@ void create_objects() {
     sprite_count = 0;
 
     // Player sprite
+    // Only needs one as its only for sorting purposes
     SpriteObject *vo = &viewable_objects[sprite_count];
 
     C2D_Sprite spr = { 0 };
@@ -1101,6 +1126,7 @@ void create_objects() {
 
                 get_fade_vars(obj, calc_x, &fade_x, &fade_y, &fade_scale);
 
+                // Handle saw rotation
                 objects.rotation[obj] += (((objects.random[obj] & 1) ? -get_rotation_speed(objects.id[obj]) : get_rotation_speed(objects.id[obj]))) * delta;
                 
                 // Handle special fade types
@@ -1153,7 +1179,7 @@ void create_objects() {
                 col.color.g = 255;
                 col.color.b = 255;
                 col.blending = false;
-            } else if (col_channel == CHANNEL_INVISIBLE_GLOW) {
+            } else if (col_channel == CHANNEL_INVISIBLE_GLOW) { // Handle invisible blocks color lerping
                 Color lbg = channels[CHANNEL_LBG_NOLERP].color;
                 Color p1 = get_white_if_black(p1_color);
                 float opacity = objects.opacity[obj->obj];
@@ -1368,6 +1394,7 @@ void update_bottom_particles(float delta) {
     bool flying_gamemode = (state.player.gamemode == GAMEMODE_SHIP || state.player.gamemode == GAMEMODE_BIRD || state.player.gamemode == GAMEMODE_DART);
     if (state.dual) flying_gamemode = flying_gamemode || (state.player2.gamemode == GAMEMODE_SHIP || state.player2.gamemode == GAMEMODE_BIRD || state.player2.gamemode == GAMEMODE_DART);
 
+    // If in game and not paused and not fading, update the particles spawning
     if (((game_state == STATE_GAME && !game_paused)) && !get_fade_status()) {
         if (flying_gamemode) {
             glitter_particles_bottom.emitterX = 320/2;
@@ -1612,6 +1639,7 @@ float approachf(float current, float target, float speed, float smoothing) {
 
 void handle_mirror_transition() {
     if (state.mirroring) {
+        // Do the easing
         state.mirror_factor = easeValue(EASE_IN_OUT, state.original_mirror_factor, state.intended_mirror_factor, state.mirror_timer, MIRROR_DURATION, 1.2);
 
         state.mirror_speed_factor = 1 - 2*state.mirror_factor;

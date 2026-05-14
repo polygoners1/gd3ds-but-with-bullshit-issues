@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "level_loading.h"
-#include "defines.h"
 #include <zlib.h>
 #include <ctype.h>
 #include <string.h>
@@ -160,10 +159,10 @@ char *extract_gmd_key(const char *data, const char *key, const char *type) {
 bool is_ascii(const unsigned char *data, int len) {
     for (int i = 0; i < len; i++) {
         if (data[i] > 0x7F) {
-            return FALSE; // Non-ASCII byte found
+            return false; // Non-ASCII byte found
         }
     }
-    return TRUE;
+    return true;
 }
 
 int b64_char(char c) {

@@ -415,7 +415,7 @@ void game_loop() {
             } else hitboxesEnabled = true;
         }      
 
-        if (hitboxesEnabled || hitboxesTempEnabled) state.hitbox_display = 1;
+        if (hitboxesEnabled || state.hitboxesTempEnabled) state.hitbox_display = 1;
         
         if (hitboxTrail) {
             hitboxesEnabled = true;
@@ -643,6 +643,7 @@ void game_loop() {
             MotionTrail_UpdateWaveTrail(&wave_trail_p2, delta);
             update_p1_trail(&state.player2, 1);
             
+            // If not dual and not ending the level, fade the p2 wave trial (doesn't work for the ending the level part oops)
             if (!state.dual || state.player.cutscene_timer > 0) {
                 if (wave_trail_p2.opacity > 0) wave_trail_p2.opacity -= (0.02f * 240) * delta;
                 
@@ -662,6 +663,7 @@ void game_loop() {
             }
         }
         
+        // If the wide settings has been changed, reinitialize screens
         if (wideEnabled != old_wide) {        
             gspWaitForVBlank();
             set_wide(wideEnabled);

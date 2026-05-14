@@ -11,8 +11,6 @@
 
 GameState state;
 
-bool hitboxesTempEnabled = false;
-
 void run_camera() {
     Player *player = &state.player;
     state.old_camera_x = state.camera_x;
@@ -181,6 +179,8 @@ void init_variables() {
     state.mirror_speed_factor = 1.f;
     state.mirror_mult = 1;
 
+    state.hitboxesTempEnabled = false;
+
     current_fading_effect = FADE_NONE;
     memset(&state.player.p1_trail_data, 0, sizeof(P1Trail) * P1_TRAIL_LENGTH);
     memset(&state.player.snap_data, 0, sizeof(SnapData));
@@ -268,7 +268,7 @@ void init_variables() {
     }
 
     state.ground_y_gfx = calc_height; 
-    hitboxesTempEnabled = false;
+    state.hitboxesTempEnabled = false;
 }
 
 void handle_death() {
@@ -278,6 +278,7 @@ void handle_death() {
         seek_mp3(level_info.song_offset);
     }
 
+    // Spawn death particles
     Player *player = (state.current_player == 1) ? &state.player2 : &state.player;
 
     UseEffect *effect = add_use_effect(player->x, player->y, -1, &death_effect, GFX_TOP);
@@ -298,6 +299,6 @@ void handle_death() {
     spawnMultipleParticles(&explosion_particles[state.current_player], 90);
     
     if (hitboxesOnDeath) {
-        hitboxesTempEnabled = true;
+        state.hitboxesTempEnabled = true;
     }
 }

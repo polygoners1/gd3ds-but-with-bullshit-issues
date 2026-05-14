@@ -96,11 +96,14 @@ void cube_gamemode(Player *player) {
 
     player->gravity = cube_accelerations[state.speed];
 
+    // Limit player speed (there is a upwards cap interestingly)
     if (player->vel_y < -810) player->vel_y = -810;
     if (player->vel_y > 1080) player->vel_y = 1080;
 
+    // If player fell above the level, die
     if (player->y > 2794.f) state.dead = true;
 
+    // Do cube rotation
     if (player->inverse_rotation) {
         player->rotation -= (415.3848f / 2) * STEPS_DT * mult * (player->mini ? 1.2f : 1.f);
     } else {
@@ -123,6 +126,7 @@ void cube_gamemode(Player *player) {
         MotionTrail_StopStroke(trail);
         update_rotation_direction(player);
 
+        // If not in a slope, snap to nearest 90 degree angle
         if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
 
@@ -138,6 +142,7 @@ void cube_gamemode(Player *player) {
     }
 
     if ((slope_data.slope_id >= 0 || player->on_ground) && jump) {
+        // If on slope, the player jumps depending on time on slope
         if (slope_data.slope_id >= 0) {
             // Slope jump
             int orient = grav_slope_orient(slope_data.slope_id, player);
@@ -172,11 +177,14 @@ void rotate_fly(Player *player, float mult) {
         player->rotation = RadToDeg(angle_rad);
         player->lerp_rotation = player->rotation;
     } else if (STEPS_DT * 72 <= diff_x * diff_x + diff_y * diff_y) {
+        // This is how gd does rotation
 		player->rotation = RadToDeg(slerp_fancy(DegToRad(player->rotation), angle_rad, (STEPS_DT * 60) * mult));
         player->lerp_rotation = player->rotation;
 	}
 }
 
+// Ball rotation multiplier
+// TODO: reverse engineer this
 float get_ball_rotation_speed(Player *player) {
     float speed = (player->mini ? 0.16f : 0.2f);
     switch (state.speed) {
@@ -249,7 +257,7 @@ void ship_gamemode(Player *player) {
     drag_particles_2[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     if (state.dual) {
-        // Make both dual players symetric
+        // Make both dual players symmetric by using inverted ship gravity
         if (state.input.holdJump) {
             player->buffering_state = BUFFER_END;
             if (player->vel_y <= -101.541492f)
@@ -301,6 +309,7 @@ void ball_gamemode(Player *player) {
 
     int mult = (player->upside_down ? -1 : 1);
 
+    // If player left slope, set gravity
     if (!state.old_player.velocity_override || state.old_player.slope_data.slope_id >= 0)
         player->gravity = -1676.46672f;  
     
@@ -315,7 +324,7 @@ void ball_gamemode(Player *player) {
 
     drag_particles[state.current_player].gravityFlipped = player->upside_down;
     drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
-    // Jump
+    // If on ground (block or slope) and its buffering, do a jump
     if ((player->slope_data.slope_id >= 0 || player->on_ground || player->on_ceiling) && player->buffering_state == BUFFER_READY) {        
         float delta_y = player->vel_y;
 
@@ -384,6 +393,7 @@ void ufo_gamemode(Player *player) {
 
     int mult = (player->upside_down ? -1 : 1);
     bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) && (state.input.holdJump));
+    // If buffering, jump
     if (player->buffering_state == BUFFER_READY && (state.input.pressedJump || buffering_check)) {
         player->vel_y = fmaxf(player->vel_y, player->mini ? 358.992 : 371.034);
         player->buffering_state = BUFFER_END;
@@ -391,6 +401,7 @@ void ufo_gamemode(Player *player) {
         player->ufo_last_y = player->y;
         player->burst_particle_timer = BURST_PARTICLES_DURATION;
     } else {
+        // Same as ship
         if (!state.dual) {
             if (player->vel_y > grav(player, 103.485494)) {
                 player->gravity = player->mini ? -1969.92 : -1676.84;
@@ -417,10 +428,12 @@ void ufo_gamemode(Player *player) {
     burst_particles[state.current_player].gravityFlipped = player->upside_down;
     burst_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
+    // If on ground, set last y position
     if (player->on_ground) {
         player->ufo_last_y = player->y;
     }
 
+    // Set the player rotation depending on how far vertical from the y point the ufo is
     if (player->slope_data.slope_id < 0) {
         float y_diff = (player->y - player->ufo_last_y) * mult;
 
@@ -477,7 +490,7 @@ void wave_gamemode(Player *player) {
 void clamp_player_ground(Player *player) {
     bool slopeCheck = player->slope_data.slope_id >= 0 && (grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_NORMAL_DOWN || grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_UD_DOWN);
 
-    // Ground
+    // Check for ground collision
     if (getGroundBottom(player) < state.ground_y) {
         if (player->ceiling_inv_time <= 0 && player->gravObj_id < 0 && player->gamemode == GAMEMODE_PLAYER && player->upside_down) {
             state.dead = true;
@@ -492,7 +505,7 @@ void clamp_player_ground(Player *player) {
         player->snap_data.player_frame = 0;
     }
 
-    // Ceiling
+    // Check for ceiling collision
     if (getGroundTop(player) > state.ceiling_y) {
         if (player->ceiling_inv_time <= 0  && player->gravObj_id < 0 && player->gamemode == GAMEMODE_PLAYER && !player->upside_down) {
             state.dead = true;
@@ -546,7 +559,7 @@ void run_player(Player *player) {
         spawnMultipleParticles(&land_particles[state.current_player], 10);
     }
 
-    // Coyote
+    // Coyote time (only applies to upside down gravity)
     if (gravBottom(&state.old_player) > gravFloor(&state.old_player) && player->upside_down == state.old_player.upside_down && !player->on_ground && player->vel_y <= 0) {
 		if (state.old_player.on_ground && !state.old_input.holdJump)
 			player->coyote_frames = 0;
@@ -591,6 +604,7 @@ void run_player(Player *player) {
     
     player->time_since_ground += STEPS_DT;
 
+    // Fade wave trail if not in wave anymore or end animation started
     if (player->gamemode != GAMEMODE_DART || player->cutscene_timer > 0) {
         if (wave_trail->opacity > 0) wave_trail->opacity -= 0.02f;
         
@@ -600,6 +614,7 @@ void run_player(Player *player) {
         }
     }
 
+    // Weird stuff indeed
     if (!player->velocity_override) {
 		float newVel = player->vel_y + player->gravity * STEPS_DT;
 
@@ -614,10 +629,6 @@ void run_player(Player *player) {
         player->vel_y = newVel;
 	}
 
-    if (player->gamemode != GAMEMODE_PLAYER_BALL) {
-        player->vel_y = player->vel_y;
-    }
-
     if (player->cutscene_timer > 0) return;
 
     player->rotation = normalize_angle(player->rotation);
@@ -625,6 +636,8 @@ void run_player(Player *player) {
     if (player->snap_rotation) {
         player->lerp_rotation = player->rotation;
     } else {
+        // Lerp the player rotation
+        // TODO: look at how gd does this for ufo and cube
         if (player->gamemode == GAMEMODE_BIRD) {
             if (player->slope_data.slope_id >= 0) {
                 player->lerp_rotation = iSlerp(player->lerp_rotation, player->rotation, 0.05f, STEPS_DT);
@@ -638,6 +651,7 @@ void run_player(Player *player) {
 
     player->left_ground = false;
 
+    // If the player hits a gravity changing object, theres a small period of time where the cube doesn't die to ceilings
     if (player->ceiling_inv_time > 0) {
         player->ceiling_inv_time -= STEPS_DT;
     } else {
@@ -646,6 +660,7 @@ void run_player(Player *player) {
 
     clamp_player_ground(player);
     
+    // Coyote time for slopes, so you can jump if you only touch the slope for a single frame (and fixes some visual bugs)
     if (player->slope_slide_coyote_time) {
         player->slope_slide_coyote_time--;
 
@@ -658,19 +673,21 @@ void run_player(Player *player) {
         }
     }
 
+    // If player is on slope, do slope stuff
     if (player->slope_data.slope_id >= 0) {
         slope_calc(player->slope_data.slope_id, player);
     }
 
+    // Handle wave trail point adding
     if (player->gamemode == GAMEMODE_DART) {    
         wave_trail->positionR = (Vec2){player->x, player->y};  
         wave_trail->startingPositionInitialized = true;
         if (player->vel_y != state.old_player.vel_y || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling) {
             MotionTrail_AddWavePoint(wave_trail);
-        } else {     
         }
     }
 
+    // Handle rotation for ship and wave
     if (player->gamemode == GAMEMODE_SHIP) rotate_fly(player, 0.15f);
     if (player->gamemode == GAMEMODE_DART) rotate_fly(player, player->mini ? 0.4f : 0.25f);
 
@@ -715,11 +732,13 @@ void handle_player(Player *player) {
         player->new_vel_y = __FLT_MAX__;
     }
 
+    // Run actions that were queued last frame
     for (int i = 0; i < num_actions[state.current_player]; i++) {
         player_actions[state.current_player][i].func(player);
     }
     num_actions[state.current_player] = 0;
 
+    // The svc calls are for profiling
     u64 start = svcGetSystemTick();
     collide_with_objects(player);
     u64 end = svcGetSystemTick();
@@ -738,6 +757,7 @@ void handle_player(Player *player) {
     
     if (state.noclip) state.dead = false;
     
+    // Run dual ball being repelled when touching
     do_ball_reflection();
 
     player->delta_y = player->y - state.old_player.y;
@@ -745,6 +765,7 @@ void handle_player(Player *player) {
     u64 end_player = svcGetSystemTick();
     ticks = end_player - start_player;
 
+    // Add player hitboxes to hitbox trail
     if (state.hitbox_display == 2) add_new_hitbox(player);
     handle_player_time += ticks / CPU_TICKS_PER_MSEC;
 }
@@ -789,7 +810,7 @@ void spawn_p1_trail(Player *player) {
 }
 
 void update_p1_trail(Player *player, int player_id) {
-    // Spawn new p1 icon
+    // Spawn new p1 icon every 3 frames (the division hurts)
     if (!state.dead && p1_trail && (frame_counter % 3) == 0) {
         // If current player is player 2, dual must be true
         if (player_id == 0 || state.dual) {
@@ -855,6 +876,7 @@ void draw_player(Player *player) {
 
     float scale = (player->mini) ? 0.6f : 1.f;
 
+    // All of this is just for calculating the cube position in ufo and ship
     float rad = C3D_AngleFromDegrees(player->rotation);
     float cos_r = cosf(rad);
     float sin_r = sinf(rad);
@@ -878,6 +900,8 @@ void draw_player(Player *player) {
 
     float calc_x_mirror = get_mirror_x(calc_x, state.mirror_factor);
     float p_rot = player->lerp_rotation * state.mirror_mult;
+
+
 
     bool glow_enabled = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
 
@@ -987,6 +1011,7 @@ void draw_hitbox(int obj) {
     if (hitbox_type == HITBOX_SOLID) color = C2D_Color32(0x00, 0x00, 0xff, 0xff);
     if (hitbox_type == HITBOX_SPECIAL) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
     
+    // Current slope and x snapped obj gets its own colors
     if (obj == state.player.slope_data.slope_id || obj == state.player2.slope_data.slope_id) color = C2D_Color32(0x00, 0xff, 0x00, 0xff);
     if (obj == state.player.snap_data.snapped_obj || obj == state.player2.snap_data.snapped_obj) color = C2D_Color32(0xff, 0xff, 0x00, 0xff);
 
@@ -1002,7 +1027,6 @@ void draw_hitbox(int obj) {
 
         custom_circunference(mirror_x_on_screen(x), calc_y_on_screen(y), calc_radius, color, 2.f);
     } else if (w != 0 && h != 0) {
-        //if (hitbox_type == HITBOX_SPECIAL && !objects.touch_triggered[obj]) return;
         get_corners(x, y, w, h, angle, rect);
         draw_square(rect, color);
     }

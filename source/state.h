@@ -85,6 +85,8 @@ typedef struct {
     float timer;
     float death_timer;
 
+    bool hitboxesTempEnabled;
+
     bool custom_level;
     char custom_level_path[256];
 
@@ -108,4 +110,3 @@ void run_camera();
 void handle_death();
 
 extern bool disableHitboxesAfterRespawn;
-extern bool hitboxesTempEnabled;

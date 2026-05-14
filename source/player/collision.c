@@ -180,6 +180,7 @@ void trySnap(int block, Player *player) {
         diff.y = grav(player, diff.y);
         float threshold = snap_player(diff, player);
         if (threshold > 0) {
+            // Snap the player up to threshold
             player->x = clampf(
                 objects.x[block] + player->snap_data.player_snap_diff,
                 player->x - threshold,
@@ -278,7 +279,7 @@ void setup_dual() {
     state.player2.upside_down = state.player.upside_down ^ 1;
 }
 
-
+// Handle collision with special objects (orbs, pads, portals)
 void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
     switch (objects.id[obj]) {
         case YELLOW_PAD:
@@ -1017,6 +1018,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
         case HITBOX_SOLID: 
             bool gravSnap = false;
 
+            // This is equal to using the old player y position (a frame of snap leeway)
             clip += fabsf(player->vel_y) * STEPS_DT;
 
             
@@ -1032,6 +1034,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
             bool safeZone = player->mini && ((obj_gravTop(player, obj) - gravBottom(player) <= clip) || (gravTop(player) - obj_gravBottom(player, obj) <= clip));
             
+            // Check collision with internal hitbox
             if ((player->gamemode == GAMEMODE_DART || (!gravSnap && !safeZone)) && intersect(
                 player->x, player->y, internal.width, internal.height, 0, 
                 objects.x[obj], objects.y[obj], hitbox->width, hitbox->height, objects.rotation[obj]
@@ -1052,10 +1055,12 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             
             float bottom = gravBottom(player);
 
+            // If you are on a slope, no collision for you (this is shit)
             if (player->slope_data.slope_id >= 0) {
                 return;
             }
-              
+
+            // Check for slopes so this block doesn't catch up a down going slope  
             for (size_t i = 0; i < potential_slopes[state.current_player]; i++) {
                 int potential_slope = potential_slopes_buffer[state.current_player][i];
 
@@ -1077,6 +1082,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player->time_since_ground = 0;
 
                 if (player->gamemode == GAMEMODE_PLAYER) {
+                    // Check for x snap
                     if (!state.old_player.on_ground) {
                         if (player->snap_data.player_frame > 0 && player->snap_data.player_frame + 1 < player->frame) {
                             trySnap(obj, player);
@@ -1143,6 +1149,7 @@ void collide_with_obj(Player *player, int obj) {
     } else {
         float obj_rot = normalize_angle(objects.rotation[obj]);
 
+        // No rotation for solid hitboxes
         if (hitbox->collision_type == HITBOX_SOLID) {
             obj_rot = 0;
         }
@@ -1184,6 +1191,7 @@ void collide_with_slope(Player *player, int obj, bool has_slope) {
         player->x, player->y, player->width, player->height, 0, 
         objects.x[obj], objects.y[obj], width, height, objects.rotation[obj]
     )) {
+        // Idk what this does
         if (has_slope) {
             float bottom = gravBottom(player) + sinf(slope_angle(player->slope_data.slope_id, player)) * player->height / 2;
             if (obj_gravTop(player, obj) - bottom < 2)
@@ -1251,18 +1259,21 @@ void collide_with_objects(Player *player) {
         clear_slope_data(player);
     }
 
+    // Check blocks
     for (int i = 0; i < block_count; i++) {
         int obj = block_buffer[i];
         collide_with_obj(player, obj);
     }
     potential_slopes[state.current_player] = 0;
 
+    // Check slopes
     bool has_slope = player->slope_data.slope_id >= 0;
     for (int i = 0; i < slope_count; i++) {
         int obj = slope_buffer[i];
         collide_with_slope(player, obj, has_slope);
     }
     
+    // Check hazards (spikes, saws)
     for (int i = 0; i < hazard_count; i++) {
         int obj = hazard_buffer[i];
         collide_with_obj(player, obj);
