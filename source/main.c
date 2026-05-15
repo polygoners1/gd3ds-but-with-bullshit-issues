@@ -656,9 +656,19 @@ void game_loop() {
             if (state.mirroring) {
                 state.mirror_timer += delta;
                 if (state.mirror_timer > MIRROR_DURATION) {
-                    state.mirroring = 0;
+                    state.mirroring = false;
                     state.mirror_factor = state.intended_mirror_factor;
                     state.mirror_speed_factor = 1 - 2*state.mirror_factor;
+
+                    // When mirror transition ends, put a wave trail point
+                    if (state.player.gamemode == GAMEMODE_DART) {
+                        wave_trail_p1.positionR = (Vec2){ state.player.x, state.player.y };
+                        MotionTrail_AddWavePoint(&wave_trail_p1);
+                    }
+                    if (state.dual && state.player2.gamemode == GAMEMODE_DART) {
+                        wave_trail_p2.positionR = (Vec2){ state.player2.x, state.player2.y };
+                        MotionTrail_AddWavePoint(&wave_trail_p2);
+                    }
                 }
             }
         }
