@@ -1101,9 +1101,19 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             
             float bottom = gravBottom(player);
 
-            // If you are on a slope, no collision for you (this is shit)
+            // If you are on a slope, check more stuff (this is less shit than before)
             if (player->slope_data.slope_id >= 0) {
-                return;
+                int orient = grav_slope_orient(player->slope_data.slope_id, player);
+
+                // Down slope must never exit
+                bool downSlope = (orient == ORIENT_NORMAL_DOWN || orient == ORIENT_UD_DOWN);
+                if (!downSlope || obj_gravTop(player, obj) - gravBottom(player) > clip) {
+                    return;
+                }
+                // Check if block should collide with player, then bye bye slope
+                if (obj_getRight(obj) >= player->x) {
+                    clear_slope_data(player);
+                }
             }
 
             // Check for slopes so this block doesn't catch up a down going slope  
