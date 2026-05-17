@@ -1107,7 +1107,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
                 // Down slope must never exit
                 bool downSlope = (orient == ORIENT_NORMAL_DOWN || orient == ORIENT_UD_DOWN);
-                if (!downSlope || obj_gravTop(player, obj) - gravBottom(player) > clip) {
+                if (!downSlope) {
                     return;
                 }
                 // Check if block should collide with player, then bye bye slope
@@ -1267,6 +1267,50 @@ int potential_slopes[2];
 
 int number_of_collisions = 0;
 int number_of_collisions_checks = 0;
+
+// Count how many slopes is the player touching, in the case the player has an slope, it checks only the slopes with the same orientation
+int get_player_touching_slopes(Player *player) {
+    int sx = (int)(player->x / SECTION_SIZE);
+    int sy = (int)(player->y / SECTION_SIZE);
+
+    int count = 0;
+    
+    // Count slopes
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            Section *sec = get_section(sx + dx, sy + dy);
+            for (int i = 0; i < sec->object_count; i++) {
+                int obj = sec->objects[i];
+
+                // Skip invalid objects
+                if (!is_valid_object(objects.id[obj])) continue;
+
+                const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
+
+                if (!hitbox) continue;
+
+                if (hitbox->collision_type == HITBOX_SOLID && hitbox->type == COLLISION_SLOPE) {
+                    float width = hitbox->width;
+                    float height = hitbox->height;
+                    if (intersect(
+                        player->x, player->y, player->width + 2, player->height + 2, 0, 
+                        objects.x[obj], objects.y[obj], width, height, objects.rotation[obj]
+                    )) {
+                        if (player->slope_data.slope_id >= 0) {
+                            if (grav_slope_orient(player->slope_data.slope_id, player) == grav_slope_orient(obj, player)) {
+                                count++;
+                            }
+                        } else {
+                            count++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return count;
+}
 
 void collide_with_objects(Player *player) {
     int sx = (int)(player->x / SECTION_SIZE);
