@@ -215,13 +215,13 @@ void slope_calc(int obj, Player *player) {
 
             vel *= time;
 
-            player->new_vel_y = vel;
             player->inverse_rotation = true;
             player->coyote_slope = player->slope_data;
             player->slope_slide_coyote_time = 2;
 
-            // This is stupid, but works!
-            player->x -= player->vel_x * STEPS_DT;
+            // This is less stupid, but works!
+            player->y -= vel * STEPS_DT;
+            player->new_vel_y = vel + player->gravity * STEPS_DT;
             
             push_player_action(clear_slope_data);
         }
@@ -284,16 +284,15 @@ void slope_calc(int obj, Player *player) {
             }
 
             vel *= time;
-
-            player->new_vel_y = -vel;
             
             player->inverse_rotation = true;
             player->coyote_slope = player->slope_data;
             player->slope_slide_coyote_time = 2;
             push_player_action(clear_slope_data);
             
-            // This is stupid, but works!
-            player->x -= player->vel_x * STEPS_DT;
+            // This is less stupid, but works!
+            player->y -= -vel * STEPS_DT;
+            player->new_vel_y = -vel + player->gravity * STEPS_DT;
 
             //output_log("Tick %d - Exit vel %.2f\n", player->frame, player->new_vel_y);
         }
