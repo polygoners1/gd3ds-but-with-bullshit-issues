@@ -22,6 +22,47 @@ const float falls[SPEED_COUNT] = {
     421.200108
 };
 
+// Count how many slopes is the player touching, in the case the player has an slope, it checks only the slopes with the same orientation
+int get_player_touching_slopes(Player *player) {
+    int sx = (int)(player->x / SECTION_SIZE);
+    int sy = (int)(player->y / SECTION_SIZE);
+
+    int count = 0;
+    
+    // Count slopes
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            Section *sec = get_section(sx + dx, sy + dy);
+            for (int i = 0; i < sec->object_count; i++) {
+                int obj = sec->objects[i];
+
+                // Skip invalid objects
+                if (!is_valid_object(objects.id[obj])) continue;
+
+                const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
+
+                if (!hitbox) continue;
+
+                if (hitbox->collision_type == HITBOX_SOLID && hitbox->type == COLLISION_SLOPE) {
+                    // If touching do stuff
+                    if (slope_touching(obj, player)) {
+                        int slope = player->slope_data.slope_id;
+                        if (slope >= 0) {
+                            if (grav_slope_orient(slope, player) == grav_slope_orient(obj, player) && slope_angle(slope, player) == slope_angle(obj, player)) {
+                                count++;
+                            }
+                        } else {
+                            count++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return count;
+}
+
 void clear_slope_data(Player *player) {
     player->slope_data.slope_id = -1;
     player->slope_data.elapsed = 0;
