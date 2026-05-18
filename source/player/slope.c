@@ -48,7 +48,11 @@ int get_player_touching_slopes(Player *player) {
                     if (slope_touching(obj, player)) {
                         int slope = player->slope_data.slope_id;
                         if (slope >= 0) {
-                            if (grav_slope_orient(slope, player) == grav_slope_orient(obj, player) && slope_angle(slope, player) == slope_angle(obj, player)) {
+                            if ((grav_slope_orient(slope, player) == grav_slope_orient(obj, player) && 
+                                slope_angle(slope, player) == slope_angle(obj, player) &&
+                                fabsf(objects.y[slope] - objects.y[obj]) > 15) || // Minimum distance
+                                slope == obj
+                            ) {
                                 count++;
                             }
                         } else {
@@ -285,7 +289,7 @@ void slope_calc(int obj, Player *player) {
             player->coyote_slope = player->slope_data;
             player->slope_slide_coyote_time = 4;
             push_player_action(clear_slope_data);
-        }
+        }        
     } else if (orientation == ORIENT_UD_UP) { // Upside down - up
         // Make the player start with higher velocity 
         if ((player->gamemode == GAMEMODE_BIRD || player->gamemode == GAMEMODE_SHIP) && player->vel_y > -SHIP_UFO_EXITING_VEL && !state.input.holdJump) {
