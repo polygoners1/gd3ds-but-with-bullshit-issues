@@ -1353,6 +1353,8 @@ int load_level(char *path) {
 
     init_col_channels();
     set_color_channels();
+
+    memset(&state.current_data, 0, sizeof(StateLevelData));
     
     int rounded_last_obj_x = (int) (level_info.last_obj_x / 30) * 30 + 15;
     level_info.wall_x = rounded_last_obj_x;

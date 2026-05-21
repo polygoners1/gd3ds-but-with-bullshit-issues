@@ -42,6 +42,10 @@ typedef struct {
 } BGFlashData;
 
 typedef struct {
+    int attempts;
+} StateLevelData;
+
+typedef struct {
     float camera_x;
     float camera_y;
 
@@ -73,6 +77,8 @@ typedef struct {
     unsigned char current_player;
 
     Player old_player;
+
+    StateLevelData current_data;
 
     bool mirroring;
     int mirror_mult;    

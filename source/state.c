@@ -97,9 +97,15 @@ void run_camera() {
         state.camera_y_lerp = cam_y;
         state.camera_y = state.camera_y_lerp;
 
-        state.camera_x = MAX(player->x - 125.0f/SCALE, 0);
+        state.camera_x = player->x - 125.0f/SCALE;
         
-        if (player->x - 125.0f/SCALE > 0) {
+        if (state.current_data.attempts == 1) {
+            if (state.camera_x < 0) {
+                state.camera_x = 0;
+            }
+        }
+
+        if (state.current_data.attempts > 1 || player->x - 125.0f/SCALE > 0) {
             state.ground_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
             state.background_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
         }
@@ -184,7 +190,7 @@ void init_state() {
     state.current_player = 0;
 
     state.camera_x = 0;
-    
+
     state.camera_wall_timer = 0;
     state.camera_wall_initial_y = 0;
 
@@ -210,6 +216,8 @@ void init_state() {
     state.end_wall_anim_playing = false;
     
     state.hitbox_enabled_when_dead = false;
+
+    state.current_data.attempts++;
 }
 
 void init_level_bounds() {
