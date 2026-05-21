@@ -16,8 +16,6 @@ void run_camera() {
     state.old_camera_x = state.camera_x;
     state.old_camera_y = state.camera_y;
 
-    //float calc_x = (player->x - state.camera_x);
-
     float playable_height = state.ceiling_y - state.ground_y;
     float calc_height = 0;
 
@@ -26,32 +24,22 @@ void run_camera() {
     }
     state.ground_y_gfx = ease_out(state.ground_y_gfx, calc_height, 0.02f);
 
-    state.ground_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
-    state.background_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
-
-    /*
     if (level_info.wall_y == 0) {
-        if (state.camera_x + WIDTH_ADJUST_AREA + SCREEN_WIDTH_AREA >= level_info.wall_x - (4.5f * 30.f)) {
-            level_info.wall_y = MAX(state.camera_y, -30) + (SCREEN_HEIGHT_AREA / 2);
+        if (state.camera_x + SCREEN_WIDTH_AREA >= level_info.wall_x - (4.5f * 30.f)) {
+            level_info.wall_y = MAX(state.camera_y_middle, 60 + ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET));
         }
     }
 
-    float camera_x_right = state.camera_x + WIDTH_ADJUST_AREA + SCREEN_WIDTH_AREA;
+    float camera_x_right = state.camera_x + SCREEN_WIDTH_AREA;
 
-    if (calc_x >= get_camera_x_scroll_pos()) {
-        // Cap at camera_x
-        if (level_info.wall_y > 0 && (camera_x_right >= level_info.wall_x - CAMERA_X_WALL_OFFSET)) {
-            if (state.camera_wall_timer == 0) {
-                state.background_wall_initial_x = state.background_x;
-                state.ground_wall_initial_x = state.ground_x;
-            }
-            state.background_x = easeValue(EASE_IN_OUT, state.background_wall_initial_x, state.background_wall_initial_x + CAMERA_X_WALL_OFFSET * state.mirror_speed_factor, state.camera_wall_timer, 1.f, 2.0f);            
-            state.ground_x = easeValue(EASE_IN_OUT, state.ground_wall_initial_x, state.ground_wall_initial_x + CAMERA_X_WALL_OFFSET * state.mirror_speed_factor, state.camera_wall_timer, 1.f, 2.0f);            
-        } else {
-            state.camera_x += player->vel_x * STEPS_DT;
-            state.ground_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
-            state.background_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
+    // Cap at camera_x
+    if (level_info.wall_y > 0 && (camera_x_right >= level_info.wall_x - CAMERA_X_WALL_OFFSET)) {
+        if (state.camera_wall_timer == 0) {
+            state.background_wall_initial_x = state.background_x;
+            state.ground_wall_initial_x = state.ground_x;
         }
+        state.background_x = easeValue(EASE_IN_OUT, state.background_wall_initial_x, state.background_wall_initial_x + CAMERA_X_WALL_OFFSET * state.mirror_speed_factor, state.camera_wall_timer, 1.f, 2.0f);            
+        state.ground_x = easeValue(EASE_IN_OUT, state.ground_wall_initial_x, state.ground_wall_initial_x + CAMERA_X_WALL_OFFSET * state.mirror_speed_factor, state.camera_wall_timer, 1.f, 2.0f);            
     }
 
     if (level_info.wall_y > 0 && (camera_x_right >= level_info.wall_x - CAMERA_X_WALL_OFFSET)) {
@@ -59,60 +47,67 @@ void run_camera() {
             state.camera_wall_initial_y = state.camera_y;
         }
 
-        float final_camera_x_wall = level_info.wall_x - (SCREEN_WIDTH_AREA + WIDTH_ADJUST_AREA);
-        float final_camera_y_wall = level_info.wall_y - (SCREEN_HEIGHT_AREA / 2);   
+        float final_camera_x_wall = level_info.wall_x - (SCREEN_WIDTH_AREA);
+        float final_camera_y_wall = level_info.wall_y - ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET);   
 
         state.camera_x = easeValue(EASE_IN_OUT, final_camera_x_wall - CAMERA_X_WALL_OFFSET, final_camera_x_wall, state.camera_wall_timer, CAMERA_WALL_ANIM_DURATION, 2.0f);
         state.camera_y = easeValue(EASE_IN_OUT, state.camera_wall_initial_y, final_camera_y_wall, state.camera_wall_timer, CAMERA_WALL_ANIM_DURATION, 2.0f);
         state.camera_wall_timer += STEPS_DT;
-        if (completion_shake) {
+        if (state.completion_shake) {
             state.camera_x = final_camera_x_wall + 3.f * random_float(-1, 1);
             state.camera_y = final_camera_y_wall + 3.f * random_float(-1, 1);
         }
-    } else */
-     
-    float cam_y = state.camera_y_lerp;
-    float target_y = cam_y;
-
-    #define CAM_Y_MAGIC (320 / 2)
-    #define CAM_Y_MAGIC_2 (180 / 2)
-
-    if (player->gamemode == GAMEMODE_PLAYER && !state.dual) {
-        float player_y = player->y;
-        float anchor_y = cam_y - CAM_Y_MAGIC_2 + CAM_Y_MAGIC;
+    } else { 
         
-        const float margin_above = 140 / 2;
-        const float margin_below = 80 / 2;
+        float cam_y = state.camera_y_lerp;
+        float target_y = cam_y;
 
-        if (player_y > anchor_y + margin_above) {
-            target_y = player_y - CAM_Y_MAGIC - margin_above + CAM_Y_MAGIC_2;
-        } else if (player_y < anchor_y - margin_below) {
-            target_y = player_y - CAM_Y_MAGIC + margin_below + CAM_Y_MAGIC_2;
+        #define CAM_Y_MAGIC (320 / 2)
+        #define CAM_Y_MAGIC_2 (180 / 2)
+
+        if (player->gamemode == GAMEMODE_PLAYER && !state.dual) {
+            float player_y = player->y;
+            float anchor_y = cam_y - CAM_Y_MAGIC_2 + CAM_Y_MAGIC;
+            
+            const float margin_above = 140 / 2;
+            const float margin_below = 80 / 2;
+
+            if (player_y > anchor_y + margin_above) {
+                target_y = player_y - CAM_Y_MAGIC - margin_above + CAM_Y_MAGIC_2;
+            } else if (player_y < anchor_y - margin_below) {
+                target_y = player_y - CAM_Y_MAGIC + margin_below + CAM_Y_MAGIC_2;
+            }
+        } else {
+            target_y = state.camera_intended_y;
         }
-    } else {
-        target_y = state.camera_intended_y;
-    }
+            
+        if (target_y < 0) {
+            target_y = 0;
+        }
         
-    if (target_y < 0) {
-        target_y = 0;
-    }
-    
-    cam_y += (target_y - cam_y) / (10 / 0.25f);
-    
-    if (cam_y < 0) {
-        cam_y = 0;
-    }
-    
-    if (cam_y > MAX_LEVEL_HEIGHT) {
-        cam_y = MAX_LEVEL_HEIGHT;
-    }
+        cam_y += (target_y - cam_y) / (10 / 0.25f);
+        
+        if (cam_y < 0) {
+            cam_y = 0;
+        }
+        
+        if (cam_y > MAX_LEVEL_HEIGHT) {
+            cam_y = MAX_LEVEL_HEIGHT;
+        }
 
-    state.camera_y_lerp = cam_y;
-    state.camera_y = state.camera_y_lerp;
-    state.camera_y_middle = state.camera_y + ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET);
+        state.camera_y_lerp = cam_y;
+        state.camera_y = state.camera_y_lerp;
 
-	state.camera_x = player->x - 125.0f/SCALE;
+        state.camera_x = MAX(player->x - 125.0f/SCALE, 0);
+        
+        if (player->x - 125.0f/SCALE > 0) {
+            state.ground_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
+            state.background_x += player->vel_x * STEPS_DT * state.mirror_speed_factor;
+        }
+    }
+    
     state.camera_x_middle = state.camera_x + (SCREEN_WIDTH_AREA / 2);
+    state.camera_y_middle = state.camera_y + ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET);
 }
 
 void set_hitbox_size(Player *player, int gamemode) {

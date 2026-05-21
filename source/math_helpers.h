@@ -41,3 +41,7 @@ float iSlerp(float a, float b, float ratio, float dt);
 float slerp_fancy(float fromAngle, float toAngle, float t);
 float adjust_angle_y(float angle, int flipY);
 float square_distance(float xa, float ya, float xb, float yb);
+
+float randomf();
+float random_float(float min, float max);
+int random_int(int min, int max);

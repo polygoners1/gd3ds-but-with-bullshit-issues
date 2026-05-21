@@ -10,6 +10,10 @@
 
 #define DT (1.f/60)
 
+#define CAMERA_X_OFFSET (0)
+#define CAMERA_X_WALL_OFFSET (2 * 30.F)
+#define CAMERA_WALL_ANIM_DURATION 1.f
+
 #define LIKELY(x)   __builtin_expect(!!(x), 1)
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
 

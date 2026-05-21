@@ -1070,6 +1070,70 @@ void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_
     }
 }
 
+float complete_text_elapsed = 0;
+void draw_end_wall() {  
+    if (level_info.wall_y > 0) {
+        // HERE PARTICLES LMAO<
+
+        //spawn_particle(END_WALL_PARTICLES, level_info.wall_x, level_info.wall_y, NULL);
+        //spawn_particle(END_WALL_PARTICLES, level_info.wall_x, level_info.wall_y, NULL);
+        //draw_particles(END_WALL_PARTICLES);
+        //draw_particles(END_WALL_COLL_CIRCLE);
+        //draw_particles(END_WALL_COLL_CIRCUNFERENCE);
+        //draw_particles(END_WALL_COMPLETE_CIRCLES);
+        //draw_particles(END_WALL_FIREWORK);
+        //draw_particles(END_WALL_TEXT_EFFECT);
+
+        //// Render rays
+        //draw_rays();
+
+        //if (completion_timer > 2) {
+        //    float mult = 0.5625f * screen_factor_x;
+
+        //    float offset_x = (level_complete_texture->w / 2);
+        //    float offset_y = (level_complete_texture->h / 2) + 50 * screen_factor_y;
+
+        //    float text_scale = easeValue(ELASTIC_OUT, 0, mult, complete_text_elapsed, COMPLETE_TEXT_IN_TIME, 0.6f);
+        //    GRRLIB_SetHandle(level_complete_texture, level_complete_texture->w / 2, level_complete_texture->h / 2);
+        //    GRRLIB_DrawImg(screenWidth / 2 - offset_x, screenHeight / 2 - offset_y, level_complete_texture, 0, text_scale, text_scale, 0xffffffff);
+        //    complete_text_elapsed += dt;
+        //}
+    }
+
+    float calc_x = ((level_info.wall_x - state.camera_x));
+    float calc_y =  positive_fmodf(state.camera_y, 30) + 15;  
+    if (level_info.wall_y > 0) {
+        // Draw each wall block
+        for (float i = -30; i < SCREEN_HEIGHT_AREA + 30; i += 30) {
+            C2D_Sprite block = { 0 };
+            C2D_SpriteFromSheet(&block, spriteSheet, game_objects[2].texture);
+            C3D_TexSetFilter(block.image.tex, GPU_LINEAR, GPU_LINEAR);
+            C2D_SpriteSetCenter(&block, 0.5f, 0.5f);
+            C2D_SpriteSetPos(&block, get_mirror_x(calc_x, state.mirror_factor), calc_y + i);
+            C2D_SpriteSetRotationDegrees(&block, adjust_angle(270, 0, state.mirror_mult < 0));
+            C2D_DrawSprite(&block);
+        }
+
+        change_blending(true);
+
+        C2D_ImageTint tint = { 0 };
+        Color col = get_p2_if_black(p1_color);
+        C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
+
+        // Draw glow
+        for (float i = -30; i < SCREEN_HEIGHT_AREA + 30; i += 30) {
+            C2D_Sprite glow = { 0 };
+            C2D_SpriteFromSheet(&glow, spriteSheet, game_objects[503].texture);
+            C3D_TexSetFilter(glow.image.tex, GPU_LINEAR, GPU_LINEAR);
+            C2D_SpriteSetCenter(&glow, 0.5f, 0.5f);
+            C2D_SpriteSetPos(&glow, get_mirror_x(calc_x - 25, state.mirror_factor), calc_y + i);
+            C2D_SpriteSetRotationDegrees(&glow, adjust_angle(270, 0, state.mirror_mult < 0));
+            C2D_DrawSpriteTinted(&glow, &tint);
+        }
+    }   
+    change_blending(false);
+}
+
 float object_creating_time = 0;
 float object_sorting_time = 0;
 float object_drawing_time = 0;

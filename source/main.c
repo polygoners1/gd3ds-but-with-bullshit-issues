@@ -41,6 +41,8 @@
 #include "menus/search_menu.h"
 #include "menus/saved_levels.h"
 
+#include "endwall.h"
+
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
 
@@ -682,6 +684,13 @@ void game_loop() {
             reinitialize_screens();
             old_wide = wideEnabled;
         }
+
+        // Handle level being completed
+        if (level_info.completing) {
+            if (handle_wall_cutscene(delta)) {
+                exiting_level = true;
+            }
+        }  
         
         u64 end = svcGetSystemTick();
         u64 ticks = end - start;
@@ -704,6 +713,8 @@ void game_loop() {
             C2D_ViewScale(SCALE, SCALE);
 
             draw_objects();
+
+            draw_end_wall();
 
             draw_ground(state.ground_x, state.camera_y, 0, false, SCREEN_WIDTH);
             

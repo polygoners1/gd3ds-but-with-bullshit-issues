@@ -17,7 +17,11 @@
 #include "menus/settings.h"
 #include "utils/gfx.h"
 
+#include "easing.h"
+
 inline float gravFloor(Player *player) { return player->upside_down ? -state.ceiling_y : state.ground_y; }
+
+void anim_player_to_wall(Player *player);
 
 MotionTrail *trail;
 MotionTrail trail_p1;
@@ -772,6 +776,27 @@ void handle_player(Player *player) {
     if (state.dead) return;
 
     start = svcGetSystemTick();
+
+    if (player->x >= level_info.wall_x - END_ANIMATION_X_START) {
+        p1_trail = true;
+        if (player->cutscene_timer == 0) {
+            // Add a trail point for wave
+            if (player->gamemode == GAMEMODE_DART) MotionTrail_AddWavePoint(wave_trail);
+
+            player->cutscene_initial_player_x = player->x;
+            player->cutscene_initial_player_y = player->y;
+        }
+        anim_player_to_wall(player);
+        player->lerp_rotation += easeValue(EASE_IN, 0, 415.3848f, player->cutscene_timer, 0.5f, 2.f) * STEPS_DT;
+        player->rotation = player->lerp_rotation;
+        player->cutscene_timer += STEPS_DT;
+        
+        // End level
+        if (player->x > level_info.wall_x) {
+            level_info.completing = true;
+        }
+    } 
+
     run_player(player);
     end = svcGetSystemTick();
     ticks = end - start;
@@ -790,6 +815,41 @@ void handle_player(Player *player) {
     // Add player hitboxes to hitbox trail
     if (state.hitbox_display == 2) add_new_hitbox(player);
     handle_player_time += ticks / CPU_TICKS_PER_MSEC;
+}
+
+void anim_player_to_wall(Player *player) {
+    float t = CLAMP(easeValue(QUAD_IN, 0, 1, player->cutscene_timer, END_ANIMATION_TIME, 0), 0, 1);
+
+    // (1 - t) and powers
+    float one_minus_t = 1.0f - t;
+    float one_minus_t_squared = one_minus_t * one_minus_t;
+    float t_squared = t * t;
+
+    // Final destination point (offscreen to the right, mid-screen vertically)
+    float final_x = level_info.wall_x + 30.f;
+    float final_y = level_info.wall_y - 15.f;
+
+    // Control point (slightly above and to the right of starting point)
+    float height_diff = fabsf(player->cutscene_initial_player_y - (level_info.wall_y - (SCREEN_HEIGHT_AREA / 2)));
+    float offset = height_diff * 0.5f;
+
+    float top_x = level_info.wall_x - (END_ANIMATION_X_START * (2.f / 3));
+    float top_y = level_info.wall_y + offset;
+
+    // Start point
+    float start_x = player->cutscene_initial_player_x;
+    float start_y = player->cutscene_initial_player_y;
+
+    // Quadratic Bézier interpolation
+    player->x = 
+        one_minus_t_squared * start_x +
+        2.0f * one_minus_t * t * top_x +
+        t_squared * final_x;
+
+    player->y = 
+        one_minus_t_squared * start_y +
+        2.0f * one_minus_t * t * top_y +
+        t_squared * final_y;
 }
 
 

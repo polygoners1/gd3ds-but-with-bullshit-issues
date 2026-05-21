@@ -2,6 +2,7 @@
 #include "math_helpers.h"
 #include "color_channels.h"
 
+#include <stdlib.h>
 #include <float.h>
 
 Vec2D add_vec(Vec2D a, Vec2D b) {
@@ -189,4 +190,16 @@ float adjust_angle_y(float angle, int flipY) {
 
 float square_distance(float xa, float ya, float xb, float yb) {
 	return ((xb - xa) * (xb - xa)) + ((yb - ya) * (yb - ya));
+}
+
+float randomf() {
+    return (float)rand() / __RAND_MAX;
+}
+
+float random_float(float min, float max) {
+    return ((max - min) * ((float)rand() / __RAND_MAX)) + min;
+}
+
+int random_int(int min, int max) {
+    return rand() % (max + 1 - min) + min;
 }
