@@ -26,7 +26,7 @@ extern int frame_skipped;
 #define MAX_ACTIONS 64
 
 #define END_ANIMATION_TIME 1.f
-#define END_ANIMATION_X_START (9.f * 30.f)
+#define END_ANIMATION_X_START (10.f * 30.f)
 
 typedef struct {
     int slope_id;
