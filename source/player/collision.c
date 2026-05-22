@@ -456,7 +456,12 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->vel_y /= -2;
                     player->upside_down = false;
                     player->inverse_rotation = false;
-                    player->snap_rotation = true;
+
+                    if (player->gamemode == GAMEMODE_BIRD) 
+                        player->rotation = 0;
+                    else
+                        player->snap_rotation = true;
+
                     flip_other_player(state.current_player);
                     player->left_ground = true;
                     
@@ -480,7 +485,12 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->vel_y /= -2;
                     player->upside_down = true;
                     player->inverse_rotation = false;
-                    player->snap_rotation = true;
+
+                    if (player->gamemode == GAMEMODE_BIRD) 
+                        player->rotation = 0;
+                    else
+                        player->snap_rotation = true;
+                        
                     flip_other_player(state.current_player);
                     player->left_ground = true;
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
