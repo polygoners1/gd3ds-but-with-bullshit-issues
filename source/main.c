@@ -782,10 +782,10 @@ void game_loop() {
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0,   198,  DEBUG_TEXT_SCALE, 0, "- VY: %.2f", state.player.vel_y * STEPS_DT);
 
                 
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 80,   138,  DEBUG_TEXT_SCALE, 0, "Camera");
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 80,   150,  DEBUG_TEXT_SCALE, 0, "- X: %.2f", state.camera_x);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 80,   162,  DEBUG_TEXT_SCALE, 0, "- Y: %.2f", state.camera_y);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 80,   174,  DEBUG_TEXT_SCALE, 0, "- IntY: %.2f", state.camera_intended_y);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   138,  DEBUG_TEXT_SCALE, 0, "Camera");
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   150,  DEBUG_TEXT_SCALE, 0, "- X: %.2f", state.camera_x);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   162,  DEBUG_TEXT_SCALE, 0, "- Y: %.2f", state.camera_y);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 110,   174,  DEBUG_TEXT_SCALE, 0, "- IntY: %.2f", state.camera_intended_y);
             }
 
             if (state.noclip) {

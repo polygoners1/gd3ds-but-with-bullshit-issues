@@ -45,7 +45,12 @@ int get_player_touching_slopes(Player *player) {
 
                 if (hitbox->collision_type == HITBOX_SOLID && hitbox->type == COLLISION_SLOPE) {
                     // If touching do stuff
-                    if (slope_touching(obj, player)) {
+                    bool colliding = intersect(
+                        player->x, player->y, player->width + 1, player->height + 1, 0, 
+                        objects.x[obj], objects.y[obj], objects.width[obj], objects.height[obj], 0
+                    );
+                    
+                    if (colliding && slope_touching(obj, player)) {
                         int slope = player->slope_data.slope_id;
                         if (slope >= 0) {
                             if ((grav_slope_orient(slope, player) == grav_slope_orient(obj, player) && 
@@ -242,7 +247,10 @@ void slope_calc(int obj, Player *player) {
         }
 
         // On slope
-        slope_snap_y(obj, player);
+        if (gravBottom(player) != obj_gravTop(player, obj))
+            slope_snap_y(obj, player);
+
+        output_log("Tick %d - NRM player %.2f, obj %.2f slopes %d\n", player->frame, gravBottom(player), obj_gravTop(player, obj), get_player_touching_slopes(player));
 
         // Sliding off slope
         if (gravBottom(player) >= obj_gravTop(player, obj) && get_player_touching_slopes(player) < 2) {
@@ -309,7 +317,10 @@ void slope_calc(int obj, Player *player) {
         }
 
         // On slope
-        slope_snap_y(obj, player);
+        if (gravBottom(player) != obj_gravTop(player, obj))
+            slope_snap_y(obj, player);
+
+        output_log("Tick %d - UD player %.2f, obj %.2f slopes %d\n", player->frame, gravTop(player), obj_gravBottom(player, obj), get_player_touching_slopes(player));
 
         // Sliding off slope
         if (gravTop(player) <= obj_gravBottom(player, obj) && get_player_touching_slopes(player) < 2) {
@@ -355,7 +366,7 @@ void slope_calc(int obj, Player *player) {
         }
 
         // On slope
-        if (gravTop(player) != obj_gravBottom(player, obj) || player->slope_data.snapDown) {
+        if (gravBottom(player) != obj_gravTop(player, obj) || player->slope_data.snapDown) {
             slope_snap_y(obj, player);
         }
 
