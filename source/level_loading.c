@@ -85,7 +85,7 @@ void assign_object_to_section(int obj) {
 char *read_file(const char *filepath, size_t *out_size) {
     FILE *f = fopen(filepath, "rb");
     if (!f) {
-        printf("Failed to open file: %s\n", filepath);
+        output_log("Failed to open file: %s\n", filepath);
         return NULL;
     }
     fseek(f, 0, SEEK_END);
@@ -94,7 +94,7 @@ char *read_file(const char *filepath, size_t *out_size) {
 
     char *buffer = malloc(size + 1);
     if (!buffer) {
-        printf("Failed to allocate file\n");
+        output_log("Failed to allocate file\n");
         fclose(f);
         return NULL;
     }
@@ -128,7 +128,7 @@ char *extract_gmd_key(const char *data, const char *key, const char *type) {
 
     // Confirm that the type start tag is here
     if (strncmp(start, type_start_tag, strlen(type_start_tag)) != 0) {
-        printf("Expected start tag '%s' not found after key\n", type_start_tag);
+        output_log("Expected start tag '%s' not found after key\n", type_start_tag);
         return NULL;
     }
 
@@ -140,7 +140,7 @@ char *extract_gmd_key(const char *data, const char *key, const char *type) {
     snprintf(type_end_tag, sizeof(type_end_tag), "</%s>", type);
     char *end = strstr(start, type_end_tag);
     if (!end) {
-        printf("Could not find end tag '%s'\n", type_end_tag);
+        output_log("Could not find end tag '%s'\n", type_end_tag);
         return NULL;
     }
 
@@ -148,7 +148,7 @@ char *extract_gmd_key(const char *data, const char *key, const char *type) {
     int len = end - start;
     char *value = malloc(len + 1);
     if (!value) {
-        printf("malloc for gmd key %s failed\n", key);
+        output_log("malloc for gmd key %s failed\n", key);
         return NULL;
     }
     strncpy(value, start, len);
@@ -190,7 +190,7 @@ int base64_decode(const char *in, unsigned char *out) {
         int d = in[i+3] == '=' ? 0 : b64_char(in[i+3]);
 
         if (a == -1 || b == -1 || c == -1 || d == -1) {
-            printf("Invalid base64 character at position %d\n", i);
+            output_log("Invalid base64 character at position %d\n", i);
             return -1;
         }
 
@@ -240,14 +240,14 @@ char *decompress_data(unsigned char *data, int data_len, uLongf *out_len) {
     strm.avail_in = data_len;
 
     if (inflateInit2(&strm, 15 | 32) != Z_OK) {   // auto-detect gzip/zlib
-        printf("Failed to initialize zlib stream for GZIP\n");
+        output_log("Failed to initialize zlib stream for GZIP\n");
         return NULL;
     }
 
     // Allocate exactly enough memory (+1 for null terminator if needed)
     char *out = malloc(final_size + 1);
     if (!out) {
-        printf("malloc failed for %lu bytes\n", (unsigned long)final_size);
+        output_log("malloc failed for %lu bytes\n", (unsigned long)final_size);
         inflateEnd(&strm);
         return NULL;
     }
@@ -257,7 +257,7 @@ char *decompress_data(unsigned char *data, int data_len, uLongf *out_len) {
 
     int ret = inflate(&strm, Z_FINISH);
     if (ret != Z_STREAM_END) {
-        printf("inflate failed with code %d\n", ret);
+        output_log("inflate failed with code %d\n", ret);
         free(out);
         inflateEnd(&strm);
         return NULL;
@@ -320,7 +320,7 @@ char *decompress_level(char *data) {
     unsigned char *decoded = malloc(strlen(b64));
     int decoded_len = base64_decode(b64, decoded);
     if (decoded_len <= 0) {
-        printf("Failed to decode base64\n");
+        output_log("Failed to decode base64\n");
         free(b64);
         free(decoded);
         return NULL;
@@ -329,7 +329,7 @@ char *decompress_level(char *data) {
     uLongf decompressed_len;
     char *decompressed = decompress_data(decoded, decoded_len, &decompressed_len);
     if (!decompressed) {
-        printf("Decompression failed (check zlib error above)\n");
+        output_log("Decompression failed (check zlib error above)\n");
         free(decoded);
         free(b64);
         return NULL;
@@ -414,7 +414,7 @@ void parse_color_channel(GDColorChannel *channels, int i, char *channel_string) 
 int parse_old_channels(char *level_string, GDColorChannel **outArray) {
     GDColorChannel *channels = malloc(sizeof(GDColorChannel) * 2);
     if (!channels) {
-        printf("Couldn't alloc initial pre 2.0 color channels\n");
+        output_log("Couldn't alloc initial pre 2.0 color channels\n");
         return 0;
     }
 
@@ -612,7 +612,7 @@ int parse_color_channels(const char *colorString, GDColorChannel **outArray) {
 
     GDColorChannel *channels = malloc(sizeof(GDColorChannel) * count);
     if (!channels) {
-        printf("Couldn't alloc color channels\n");
+        output_log("Couldn't alloc color channels\n");
         free_string_array(entries, count);
         return 0;
     }
@@ -1157,7 +1157,7 @@ bool parse_string(const char *levelString) {
     char **sections = split_string(levelString, ';', &sectionCount);
 
     if (sectionCount < 3) {
-        printf("Level string missing sections!\n");
+        output_log("Level string missing sections!\n");
         free_string_array(sections, sectionCount);
         return false;
     }
@@ -1167,7 +1167,7 @@ bool parse_string(const char *levelString) {
     printf("%d\n", objectCount);
     
     if (!init_arrays(objectCount)) {
-        printf("Failed to allocate object array\n");
+        output_log("Failed to allocate object array\n");
         return false;
     }
 
@@ -1179,7 +1179,7 @@ bool parse_string(const char *levelString) {
     for (int i = 0; i < objectCount; i++) {
         // Parse
         if (!parse_gd_object(sections[i + 1], i)) {
-            printf("Failed to parse object %d\n", i);
+            output_log("Failed to parse object %d\n", i);
             free_string_array(sections, sectionCount);
             return false;
         }

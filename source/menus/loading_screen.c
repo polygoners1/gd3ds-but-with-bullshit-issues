@@ -41,7 +41,8 @@ char *splash_texts[] = {
     "Wiidash is dead",
     "Also try Famidash!",
     "Check out other TFDSoft projects!",
-    "Dont make dumb issues. Please."
+    "Dont make dumb issues. Please.",
+    "Formatting SD card..."
 };
 
 #define NUM_SPLASH_TEXTS (sizeof(splash_texts) / sizeof(char *))
