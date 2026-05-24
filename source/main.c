@@ -889,6 +889,8 @@ int main(int argc, char* argv[]) {
     C2D_Prepare();
     osSetSpeedupEnable(1);
 
+    cfg_init();
+
     top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, false);
     bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, false);
 
@@ -917,8 +919,6 @@ int main(int argc, char* argv[]) {
     cache_all_sprites();
 
     loading_screen_update(40);
-
-    cfg_init();
 
     update_player_colors();
 
