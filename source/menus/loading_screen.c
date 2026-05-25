@@ -64,10 +64,12 @@ void loading_screen_init() {
     col.g = 102;
     col.b = 255;
 
-    channels[CHANNEL_BG].color = col;
-    get_buffer(CHANNEL_BG)->active = false;
+    int chan = get_col_channel_index(CHANNEL_BG);
 
-    handle_col_channel(CHANNEL_BG);
+    channels[chan].color = col;
+    get_buffer(chan)->active = false;
+
+    handle_col_channel(chan);
 
     UIElement *title = ui_get_element_by_tag(&screen_top, "title");
 

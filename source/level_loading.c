@@ -1206,21 +1206,23 @@ void set_color_channels() {
 
             default:
                 if (id < CHANNEL_P1) {
-                    memset(&channels[id], 0, sizeof(ColorChannel));
+                    int chan = get_col_channel_index(id);
+                    
+                    memset(&channels[chan], 0, sizeof(ColorChannel));
                     Color color;
                     color.r = colorChannel.fromRed;
                     color.g = colorChannel.fromGreen;
                     color.b = colorChannel.fromBlue;
 
-                    channels[id].blending = colorChannel.blending;
+                    channels[chan].blending = colorChannel.blending;
 
-                    channels[id].color = color;
+                    channels[chan].color = color;
 
-                    if (colorChannel.playerColor == 1) channels[id].color = get_p2_if_black(p1_color);
-                    if (colorChannel.playerColor == 2) channels[id].color = get_p1_if_black(p2_color); 
+                    if (colorChannel.playerColor == 1) channels[chan].color = get_p2_if_black(p1_color);
+                    if (colorChannel.playerColor == 2) channels[chan].color = get_p1_if_black(p2_color); 
 
                     if (id == CHANNEL_OBJ) {
-                        channels[CHANNEL_OBJ_BLENDING].color = color;
+                        channels[get_col_channel_index(CHANNEL_OBJ_BLENDING)].color = color;
                     }
                 }
         }

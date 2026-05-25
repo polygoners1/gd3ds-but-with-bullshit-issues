@@ -11,7 +11,9 @@ enum ColorChannelIDs {
     COL_2,
     COL_3,
     COL_4,
-    CHANNEL_BG = 1000,
+    CHANNEL_NORMAL_END,
+    CHANNEL_SPECIAL_START = 1000,
+    CHANNEL_BG = CHANNEL_SPECIAL_START,
     CHANNEL_GROUND,
     CHANNEL_LINE,
     CHANNEL_3DL,
@@ -26,7 +28,8 @@ enum ColorChannelIDs {
     CHANNEL_PINK_GLOW,
     CHANNEL_WHITE,
     CHANNEL_INVISIBLE_GLOW,
-    COL_CHANNEL_NUM,
+    COL_CHANNEL_LAST,
+    COL_CHANNEL_NUM = (COL_CHANNEL_LAST - CHANNEL_BG) + CHANNEL_NORMAL_END,
 };
 
 typedef struct {
@@ -81,6 +84,8 @@ extern Color glow_color;
 #define GET_B(color) ((color >> 16) & 0xff)
 
 void calculate_lbg();
+int get_col_channel_index(int channel);
+int get_col_channel_from_index(int index);
 void init_col_channels();
 void handle_col_channel(int chan);
 void handle_col_triggers();

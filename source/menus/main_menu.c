@@ -150,15 +150,20 @@ void main_menu_loop() {
     
     main_menu_color_index = 0;
     u32 color = default_lvl_colors[main_menu_color_index % NUM_MENU_COLORS];
+    main_menu_color_index++;
 
     Color col;
     col.r = GET_R(color);
     col.g = GET_G(color);
     col.b = GET_B(color);
 
-    channels[CHANNEL_BG].color = col;
-    channels[CHANNEL_GROUND].color = col;
-    channels[CHANNEL_LINE].color = white;
+    int chan_bg = get_col_channel_index(CHANNEL_BG);
+    int chan_ground = get_col_channel_index(CHANNEL_GROUND);
+    int chan_line = get_col_channel_index(CHANNEL_LINE);
+
+    channels[chan_bg].color = col;
+    channels[chan_ground].color = col;
+    channels[chan_line].color = white;
 
     UIElement *title = ui_get_element_by_tag(&screen_top, "title");
 

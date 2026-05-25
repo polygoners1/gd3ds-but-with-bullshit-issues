@@ -687,7 +687,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     // Blending makes zlayer one 
     int col_channel = s->col_channel;
 
-    bool blending = col_channel > 0 && (channels[col_channel].blending ^ ((zlayer & 1) == 0));
+    bool blending = col_channel > 0 && (channels[get_col_channel_index(col_channel)].blending ^ ((zlayer & 1) == 0));
 
     // If layer is a glow layer or it has blending, decrement it
     if (s->layer == 1 || blending) {
@@ -837,7 +837,7 @@ int get_obj_opacity(int obj, float x) {
             break;
             
         case 211:
-            blending = channels[objects.col_channel[obj]].blending;
+            blending = channels[get_col_channel_index(objects.col_channel[obj])].blending;
             if (!blending && objects.transition_applied[obj] == FADE_NONE) opacity = 255;
             break;
         case 207:
@@ -850,7 +850,7 @@ int get_obj_opacity(int obj, float x) {
         case 694:
         case 331:
         case 333:
-            blending = channels[objects.detail_col_channel[obj]].blending;
+            blending = channels[get_col_channel_index(objects.detail_col_channel[obj])].blending;
             if (!blending && objects.transition_applied[obj] == FADE_NONE) opacity = 255;
             break;
     }
@@ -983,10 +983,11 @@ void change_blending(bool blending) {
 
 void draw_background(float x, float y) {
     C2D_ImageTint tint = { 0 };
-    Color col = channels[CHANNEL_BG].color;
+
+    Color col = channels[get_col_channel_index(CHANNEL_BG)].color;
 
     // If flash is happening, use lbg
-    if (state.flash_data.use_lbg) col = channels[CHANNEL_LBG_NOLERP].color;
+    if (state.flash_data.use_lbg) col = channels[get_col_channel_index(CHANNEL_LBG_NOLERP)].color;
 
     C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 
@@ -1016,7 +1017,7 @@ void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_
     int mult = (is_ceiling ? -1 : 1);
     
     C2D_ImageTint tint = { 0 };
-    Color col = channels[CHANNEL_GROUND].color;
+    Color col = channels[get_col_channel_index(CHANNEL_GROUND)].color;
     C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 
     if (is_ceiling) y += GROUND_SIZE;
@@ -1051,12 +1052,13 @@ void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_
     C2D_SpriteSetScale(&ground_shadow, -1.f, 1.f);
     C2D_DrawSpriteTinted(&ground_shadow, &tint);
 
+    int line_chan = get_col_channel_index(CHANNEL_LINE);
     // Then draw the line
-    if (channels[CHANNEL_LINE].blending) {
+    if (channels[line_chan].blending) {
         change_blending(true);
     }
 
-    col = channels[CHANNEL_LINE].color;
+    col = channels[line_chan].color;
     C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 
     float line_offset = -((GROUND_SIZE / 2) - (LINE_HEIGHT / 2)) * mult;
@@ -1067,7 +1069,7 @@ void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_
     C2D_SpriteSetPos(&line, screen_width / SCALE / 2, (GROUND_SIZE / 2) + calc_y + line_offset);
     C2D_DrawSpriteTinted(&line, &tint);
 
-    if (channels[CHANNEL_LINE].blending) {
+    if (channels[line_chan].blending) {
         change_blending(false);
     }
 }
@@ -1261,12 +1263,14 @@ void create_objects() {
                 col.color.b = 255;
                 col.blending = false;
             } else if (col_channel == CHANNEL_INVISIBLE_GLOW) { // Handle invisible blocks color lerping
-                Color lbg = channels[CHANNEL_LBG_NOLERP].color;
+                int chan = get_col_channel_index(CHANNEL_LBG_NOLERP);
+
+                Color lbg = channels[chan].color;
                 Color p1 = get_white_if_black(p1_color);
                 float opacity = objects.opacity[obj->obj];
 
                 if (opacity < 0.8f || state.dead) {
-                    col = channels[CHANNEL_LBG_NOLERP];
+                    col = channels[chan];
                 } else {
                     float blendFactor = 1.9f - 1.5f * opacity;
                     float oneMinusFactor = 1.0f - blendFactor;
@@ -1281,7 +1285,7 @@ void create_objects() {
                     col.blending = true;
                 }
             } else {
-                col = channels[col_channel];
+                col = channels[get_col_channel_index(col_channel)];
             }
             
             int game_object = obj->obj;
@@ -1326,7 +1330,7 @@ void draw_objects() {
                 col.color.b = 255;
                 col.blending = false;
             } else {
-                col = channels[col_channel];
+                col = channels[get_col_channel_index(col_channel)];
             }
 
             change_blending(col.blending);
@@ -1335,15 +1339,6 @@ void draw_objects() {
             if ((col.color.r | col.color.g | col.color.b) == 0 && col.blending) continue;
             
             C2D_DrawSpriteTinted(&obj->spr, &obj->tint);
-/*
-            float calc_x = ((objects.x[game_object] - state.camera_x));
-            float calc_y = SCREEN_HEIGHT - ((objects.y[game_object] - state.camera_y));  
-            float width = objects.width[game_object];
-            float height = objects.height[game_object];
-
-            C2D_DrawRectSolid(calc_x - width/2, calc_y - height/2, 0, width, height, 
-                C2D_Color32(0, 0, 255, 255));
-*/
         } else {   
             change_blending(true);
             draw_use_effects(GFX_TOP);

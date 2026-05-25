@@ -20,6 +20,28 @@ ColorChannel channels[COL_CHANNEL_NUM];
 
 ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
 
+// Convert channel id to buffer index
+int get_col_channel_index(int channel) {
+    if (channel >= CHANNEL_SPECIAL_START) {
+        return (channel - CHANNEL_SPECIAL_START) + CHANNEL_NORMAL_END;
+    } else if (channel < 0 || channel > CHANNEL_NORMAL_END) {
+        return 0;
+    }
+
+    return channel;
+}
+
+// Convert from buffer index to channel id
+int get_col_channel_from_index(int index) {
+    if (index >= CHANNEL_NORMAL_END) {
+        return (index - CHANNEL_NORMAL_END) + CHANNEL_SPECIAL_START;
+    } else if (index < 0 || index > COL_CHANNEL_NUM) {
+        return 0;
+    }
+
+    return index;
+}
+
 int convert_one_point_nine_channel(int channel) {
     switch (channel) {
         case 1: return CHANNEL_P1;
@@ -51,71 +73,87 @@ void init_col_channels() {
         col_trigger_buffer[chan].active = false;
     }
 
-    channels[CHANNEL_BG].color.r = 0;
-    channels[CHANNEL_BG].color.g = 5;
-    channels[CHANNEL_BG].color.b = 100;
+    int bg = get_col_channel_index(CHANNEL_BG);
+    channels[bg].color.r = 0;
+    channels[bg].color.g = 5;
+    channels[bg].color.b = 100;
     
-    channels[CHANNEL_GROUND].color.r = 40;
-    channels[CHANNEL_GROUND].color.g = 125;
-    channels[CHANNEL_GROUND].color.b = 255;
+    int ground = get_col_channel_index(CHANNEL_GROUND);
+    channels[ground].color.r = 40;
+    channels[ground].color.g = 125;
+    channels[ground].color.b = 255;
        
-    channels[CHANNEL_LINE].color.r = 255;
-    channels[CHANNEL_LINE].color.g = 255;
-    channels[CHANNEL_LINE].color.b = 255;
-    channels[CHANNEL_LINE].blending = true;
+    int line = get_col_channel_index(CHANNEL_LINE);
+    channels[line].color.r = 255;
+    channels[line].color.g = 255;
+    channels[line].color.b = 255;
+    channels[line].blending = true;
     
-    channels[CHANNEL_OBJ].color.r = 255;
-    channels[CHANNEL_OBJ].color.g = 255;
-    channels[CHANNEL_OBJ].color.b = 255;
+    int obj = get_col_channel_index(CHANNEL_OBJ);
+    channels[obj].color.r = 255;
+    channels[obj].color.g = 255;
+    channels[obj].color.b = 255;
     
-    channels[CHANNEL_OBJ_BLENDING].color.r = 255;
-    channels[CHANNEL_OBJ_BLENDING].color.g = 255;
-    channels[CHANNEL_OBJ_BLENDING].color.b = 255;
-    channels[CHANNEL_OBJ_BLENDING].blending = true;
+    int obj_blend = get_col_channel_index(CHANNEL_OBJ_BLENDING);
+    channels[obj_blend].color.r = 255;
+    channels[obj_blend].color.g = 255;
+    channels[obj_blend].color.b = 255;
+    channels[obj_blend].blending = true;
     
-    channels[CHANNEL_3DL].color.r = 255;
-    channels[CHANNEL_3DL].color.g = 255;
-    channels[CHANNEL_3DL].color.b = 255;
+    int threedl = get_col_channel_index(CHANNEL_3DL);
+    channels[threedl].color.r = 255;
+    channels[threedl].color.g = 255;
+    channels[threedl].color.b = 255;
     
-    channels[CHANNEL_P1].color = get_p2_if_black(p1_color);
-    channels[CHANNEL_P1].blending = true;
+    int chn_p1 = get_col_channel_index(CHANNEL_P1);
+    channels[chn_p1].color = get_p2_if_black(p1_color);
+    channels[chn_p1].blending = true;
         
-    channels[CHANNEL_P2].color = get_p1_if_black(p2_color);
-    channels[CHANNEL_P2].blending = true;
+    int chn_p2 = get_col_channel_index(CHANNEL_P2);
+    channels[chn_p2].color = get_p1_if_black(p2_color);
+    channels[chn_p2].blending = true;
     
-    channels[CHANNEL_LBG].color.r = 255;
-    channels[CHANNEL_LBG].color.g = 255;
-    channels[CHANNEL_LBG].color.b = 255;
-    channels[CHANNEL_LBG].blending = true;
+    int lbg = get_col_channel_index(CHANNEL_LBG);
+    channels[lbg].color.r = 255;
+    channels[lbg].color.g = 255;
+    channels[lbg].color.b = 255;
+    channels[lbg].blending = true;
 
-    channels[CHANNEL_BLUE_GLOW].color.r = 0;
-    channels[CHANNEL_BLUE_GLOW].color.g = 255;
-    channels[CHANNEL_BLUE_GLOW].color.b = 255;
-    channels[CHANNEL_BLUE_GLOW].blending = true;
+    int blue_glow = get_col_channel_index(CHANNEL_BLUE_GLOW);
+    channels[blue_glow].color.r = 0;
+    channels[blue_glow].color.g = 255;
+    channels[blue_glow].color.b = 255;
+    channels[blue_glow].blending = true;
 
-    channels[CHANNEL_YELLOW_GLOW].color.r = 255;
-    channels[CHANNEL_YELLOW_GLOW].color.g = 255;
-    channels[CHANNEL_YELLOW_GLOW].color.b = 0;
-    channels[CHANNEL_YELLOW_GLOW].blending = true;
+    int yellow_glow = get_col_channel_index(CHANNEL_YELLOW_GLOW);
+    channels[yellow_glow].color.r = 255;
+    channels[yellow_glow].color.g = 255;
+    channels[yellow_glow].color.b = 0;
+    channels[yellow_glow].blending = true;
 
-    channels[CHANNEL_PINK_GLOW].color.r = 255;
-    channels[CHANNEL_PINK_GLOW].color.g = 0;
-    channels[CHANNEL_PINK_GLOW].color.b = 255;
-    channels[CHANNEL_PINK_GLOW].blending = true;
+    int pink_glow = get_col_channel_index(CHANNEL_PINK_GLOW);
+    channels[pink_glow].color.r = 255;
+    channels[pink_glow].color.g = 0;
+    channels[pink_glow].color.b = 255;
+    channels[pink_glow].blending = true;
 
-    channels[CHANNEL_WHITE].color.r = 255;
-    channels[CHANNEL_WHITE].color.g = 255;
-    channels[CHANNEL_WHITE].color.b = 255;
-    channels[CHANNEL_WHITE].blending = true;
+    int white_chn = get_col_channel_index(CHANNEL_WHITE);
+    channels[white_chn].color.r = 255;
+    channels[white_chn].color.g = 255;
+    channels[white_chn].color.b = 255;
+    channels[white_chn].blending = true;
     
-    channels[CHANNEL_INVISIBLE_GLOW].color.r = 255;
-    channels[CHANNEL_INVISIBLE_GLOW].color.g = 255;
-    channels[CHANNEL_INVISIBLE_GLOW].color.b = 255;
-    channels[CHANNEL_INVISIBLE_GLOW].blending = true;
+    int invis_glow = get_col_channel_index(CHANNEL_INVISIBLE_GLOW);
+    channels[invis_glow].color.r = 255;
+    channels[invis_glow].color.g = 255;
+    channels[invis_glow].color.b = 255;
+    channels[invis_glow].blending = true;
 }
 
 void handle_col_channel(int chan) {
-    ColTriggerBuffer *buffer = &col_trigger_buffer[chan];
+    int channel = get_col_channel_index(chan);
+
+    ColTriggerBuffer *buffer = &col_trigger_buffer[channel];
 
     if (buffer->active) {
         Color lerped_color;
@@ -128,32 +166,33 @@ void handle_col_channel(int chan) {
             lerped_color = color_to_lerp;
         }
 
-        channels[chan].color = lerped_color;
+        channels[channel].color = lerped_color;
 
         buffer->time_run += DT;
 
         if (buffer->time_run > buffer->seconds) {
             buffer->active = false;
-            channels[chan].color = color_to_lerp;
+            channels[channel].color = color_to_lerp;
         }
     }
 }
 
 ColTriggerBuffer *get_buffer(int chan) {
-    return &col_trigger_buffer[chan];
+    return &col_trigger_buffer[get_col_channel_index(chan)];
 }
 
 void handle_col_triggers() {
     for (int chan = 1; chan < COL_CHANNEL_NUM; chan++) {
-        handle_col_channel(chan);
+        handle_col_channel(get_col_channel_from_index(chan));
     }
 }
 
-
 void upload_to_buffer(int obj, int channel) {
     if (channel == 0) channel = 1;
-    ColTriggerBuffer *buffer = &col_trigger_buffer[channel];
-    buffer->old_color = channels[channel].color;
+    int buffer_channel = get_col_channel_index(channel);
+
+    ColTriggerBuffer *buffer = &col_trigger_buffer[buffer_channel];
+    buffer->old_color = channels[buffer_channel].color;
     if (objects.p1_color[obj]) {
         buffer->new_color = get_p2_if_black(p1_color);
     } else if (objects.p2_color[obj]) {
@@ -165,14 +204,14 @@ void upload_to_buffer(int obj, int channel) {
     }
 
     if (channel < CHANNEL_BG) {
-        channels[channel].blending = objects.blending[obj];
+        channels[buffer_channel].blending = objects.blending[obj];
     }
     
     
     if (objects.trig_duration[obj] == 0) {
         Color color_to_lerp = buffer->new_color;
 
-        channels[channel].color = color_to_lerp;
+        channels[buffer_channel].color = color_to_lerp;
         return;
     }
     
@@ -182,8 +221,10 @@ void upload_to_buffer(int obj, int channel) {
 }
 
 void upload_color_to_buffer(int channel, u32 color, float seconds) {
-    ColTriggerBuffer *buffer = &col_trigger_buffer[channel];
-    buffer->old_color = channels[channel].color;
+    int buffer_channel = get_col_channel_index(channel);
+
+    ColTriggerBuffer *buffer = &col_trigger_buffer[buffer_channel];
+    buffer->old_color = channels[buffer_channel].color;
     buffer->new_color.r = GET_R(color);
     buffer->new_color.g = GET_G(color);
     buffer->new_color.b = GET_B(color);
@@ -362,7 +403,7 @@ void handle_triggers() {
 
 // https://github.com/gd-programming/gd.docs/issues/87
 void calculate_lbg() {
-    ColorChannel channel = channels[CHANNEL_BG];
+    ColorChannel channel = channels[get_col_channel_index(CHANNEL_BG)];
     float h,s,v;
     
     convertRGBtoHSV(channel.color.r, channel.color.g, channel.color.b, &h, &s, &v);
@@ -376,10 +417,11 @@ void calculate_lbg() {
 
     convertHSVtoRGB(h, s, v, &r, &g, &b);
 
-    channels[CHANNEL_LBG_NOLERP].color.r = r;
-    channels[CHANNEL_LBG_NOLERP].color.g = g;
-    channels[CHANNEL_LBG_NOLERP].color.b = b;
-    channels[CHANNEL_LBG_NOLERP].blending = true;
+    int chan_lbg_nolerp = get_col_channel_index(CHANNEL_LBG_NOLERP);
+    channels[chan_lbg_nolerp].color.r = r;
+    channels[chan_lbg_nolerp].color.g = g;
+    channels[chan_lbg_nolerp].color.b = b;
+    channels[chan_lbg_nolerp].blending = true;
 
     float factor = (channel.color.r + channel.color.g + channel.color.b) / 150.f;
 
@@ -391,8 +433,9 @@ void calculate_lbg() {
     }
 
     // Set here lerped LBG
-    channels[CHANNEL_LBG].color.r = r;
-    channels[CHANNEL_LBG].color.g = g;
-    channels[CHANNEL_LBG].color.b = b;
-    channels[CHANNEL_LBG].blending = true;
+    int chan_lbg = get_col_channel_index(CHANNEL_LBG);
+    channels[chan_lbg].color.r = r;
+    channels[chan_lbg].color.g = g;
+    channels[chan_lbg].color.b = b;
+    channels[chan_lbg].blending = true;
 }
