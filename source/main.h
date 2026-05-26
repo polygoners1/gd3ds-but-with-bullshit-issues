@@ -43,6 +43,7 @@ extern ParticleSystem slow_speed_particles_bottom;
 extern ParticleSystem normal_speed_particles_bottom;
 extern ParticleSystem fast_speed_particles_bottom;
 extern ParticleSystem faster_speed_particles_bottom;
+extern ParticleSystem end_wall_particles;
 
 extern float slow_speed_particles_timer;
 extern float normal_speed_particles_timer;

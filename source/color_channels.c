@@ -24,7 +24,7 @@ ColTriggerBuffer col_trigger_buffer[COL_CHANNEL_NUM];
 int get_col_channel_index(int channel) {
     if (channel >= CHANNEL_SPECIAL_START) {
         return (channel - CHANNEL_SPECIAL_START) + CHANNEL_NORMAL_END;
-    } else if (channel < 0 || channel > CHANNEL_NORMAL_END) {
+    } else if (channel < 0 || channel >= CHANNEL_NORMAL_END) {
         return 0;
     }
 
@@ -35,7 +35,7 @@ int get_col_channel_index(int channel) {
 int get_col_channel_from_index(int index) {
     if (index >= CHANNEL_NORMAL_END) {
         return (index - CHANNEL_NORMAL_END) + CHANNEL_SPECIAL_START;
-    } else if (index < 0 || index > COL_CHANNEL_NUM) {
+    } else if (index < 0 || index >= COL_CHANNEL_NUM) {
         return 0;
     }
 

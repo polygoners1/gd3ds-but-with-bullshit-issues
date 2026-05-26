@@ -6,9 +6,8 @@
 #include "wav_player.h"
 
 #include "endwall.h"
+#include "particles/rays.h"
 
-int rays_spawned = 0;
-float first_angle = 0;
 int circles_spawned = 0;
 int circunferences_spawned = 0;
 float completion_timer = 0.0f;
@@ -19,9 +18,7 @@ bool handle_wall_cutscene(float delta) {
     if (completion_timer == 0) {
         state.completion_shake = true;
         circles_spawned = 0;
-        rays_spawned = 0;
         circunferences_spawned = 0;
-        first_angle = 0;
         
         //particle_templates[END_WALL_COLL_CIRCLE].end_scale = 400;
         //particle_templates[END_WALL_COLL_CIRCLE].life = 0.5f;
@@ -30,42 +27,19 @@ bool handle_wall_cutscene(float delta) {
         circunferences_spawned++;
         
         play_sfx(&end_sound, 1);
+
+        rays_start();
     } else if (completion_timer <= 0.2 && circunferences_spawned < 5) {
         //spawn_particle(END_WALL_COLL_CIRCUNFERENCE, level_info.wall_x, level_info.wall_y, NULL);
         circunferences_spawned++;
-    }
-
-    // Spawn rays
-    if (completion_timer > RAY_SPAWN_TIME) {
-        if (completion_timer > RAY_SPAWN_TIME + (rays_spawned * RAY_SPAWN_DELAY)) {
-
-            float angle;
-            // First ray chooses the boundary, second mirrors it, the rest are random
-            if (rays_spawned == 0) {
-                angle = first_angle = random_float(35, 45);
-            } else if (rays_spawned == 1) {
-                angle = -first_angle;
-            } else {
-                angle = random_float(0, first_angle);
-
-                // Odd rays are on the second half relative to even rays
-                if ((rays_spawned & 1) != 0) {
-                    angle = -angle;
-                }
-            }
-
-            //float width = random_float(5, 15);
-            //Color p1 = get_p2_if_black(p1_color);
-
-            //create_ray(level_info.wall_x, level_info.wall_y, angle, 1000, width, width * 5, 0.25f, RGBA(p1.r, p1.g, p1.b, random_int(63, 255)));
-            rays_spawned++;
-        }
     }
 
     // Spawn circles
     if (completion_timer > CIRCLE_SPAWN_TIME) {
         // Init circles
         if (circles_spawned == 0) {
+            rays_start_fade();
+
             //float screen_middle_x = state.camera_x_middle;
             //float screen_middle_y = state.camera_y_middle;
 
@@ -115,7 +89,6 @@ bool handle_wall_cutscene(float delta) {
                 circles_spawned++;
             }
         }
-        //fade_rays();
         state.completion_shake = false;
     }
 

@@ -69,6 +69,7 @@ ParticleSystem slow_speed_particles_bottom;
 ParticleSystem normal_speed_particles_bottom;
 ParticleSystem fast_speed_particles_bottom;
 ParticleSystem faster_speed_particles_bottom;
+ParticleSystem end_wall_particles;
 
 float slow_speed_particles_timer = 0.f;
 float normal_speed_particles_timer = 0.f;
@@ -260,6 +261,8 @@ void game_loop() {
     initParticleSystem(&fast_speed_particles, &speed_effect_fast);
     initParticleSystem(&faster_speed_particles, &speed_effect_vfast);
     initParticleSystem(&coin_pickup_particles, &coin_pickup_effect);
+
+    initParticleSystem(&end_wall_particles, &end_effect_portal);
     
     slow_speed_particles.stationary = true;
     normal_speed_particles.stationary = true;
@@ -377,6 +380,16 @@ void game_loop() {
     coin_pickup_particles.cfg.startColorRed   = 255 / 255.f;
     coin_pickup_particles.cfg.startColorGreen = 190 / 255.f;
     coin_pickup_particles.cfg.startColorBlue  = 0 / 255.f;
+    
+    end_wall_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
+    end_wall_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
+    end_wall_particles.cfg.startColorBlue  = p1_not_white.b / 255.f;
+    
+    end_wall_particles.cfg.finishColorRed   = p1_not_white.r / 255.f;
+    end_wall_particles.cfg.finishColorGreen = p1_not_white.g / 255.f;
+    end_wall_particles.cfg.finishColorBlue  = p1_not_white.b / 255.f;
+
+    end_wall_particles.scale = 1.5f;
 
     exiting_level = false;
 
@@ -605,6 +618,7 @@ void game_loop() {
             updateParticleSystem(&fast_speed_particles, delta);
             updateParticleSystem(&faster_speed_particles, delta);
             updateParticleSystem(&coin_pickup_particles, delta);
+            updateParticleSystem(&end_wall_particles, delta);
             float calc_x_speed_particles = SCREEN_WIDTH_AREA;
             float calc_y_speed_particles = (SCREEN_HEIGHT_AREA / 2);
 
@@ -636,6 +650,9 @@ void game_loop() {
                 faster_speed_particles_timer -= delta;
             }
             
+            end_wall_particles.emitterX = level_info.wall_x - 15;
+            end_wall_particles.emitterY = level_info.wall_y;
+            end_wall_particles.emitting = level_info.wall_y > 0;
 
             update_use_effects(delta, GFX_TOP);
             update_object_particles(delta);
@@ -721,7 +738,7 @@ void game_loop() {
 
             draw_objects();
 
-            draw_end_wall();
+            draw_end_wall(delta);
             
             draw_attempt_text();
 

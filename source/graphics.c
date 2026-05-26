@@ -24,6 +24,7 @@
 #include "menus/components/ui_screen.h"
 
 #include "fonts/bigFont.h"
+#include "particles/rays.h"
 
 const Color white = { 255, 255, 255 };
 
@@ -1075,35 +1076,7 @@ void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_
 }
 
 float complete_text_elapsed = 0;
-void draw_end_wall() {  
-    if (level_info.wall_y > 0) {
-        // HERE PARTICLES LMAO<
-
-        //spawn_particle(END_WALL_PARTICLES, level_info.wall_x, level_info.wall_y, NULL);
-        //spawn_particle(END_WALL_PARTICLES, level_info.wall_x, level_info.wall_y, NULL);
-        //draw_particles(END_WALL_PARTICLES);
-        //draw_particles(END_WALL_COLL_CIRCLE);
-        //draw_particles(END_WALL_COLL_CIRCUNFERENCE);
-        //draw_particles(END_WALL_COMPLETE_CIRCLES);
-        //draw_particles(END_WALL_FIREWORK);
-        //draw_particles(END_WALL_TEXT_EFFECT);
-
-        //// Render rays
-        //draw_rays();
-
-        //if (completion_timer > 2) {
-        //    float mult = 0.5625f * screen_factor_x;
-
-        //    float offset_x = (level_complete_texture->w / 2);
-        //    float offset_y = (level_complete_texture->h / 2) + 50 * screen_factor_y;
-
-        //    float text_scale = easeValue(ELASTIC_OUT, 0, mult, complete_text_elapsed, COMPLETE_TEXT_IN_TIME, 0.6f);
-        //    GRRLIB_SetHandle(level_complete_texture, level_complete_texture->w / 2, level_complete_texture->h / 2);
-        //    GRRLIB_DrawImg(screenWidth / 2 - offset_x, screenHeight / 2 - offset_y, level_complete_texture, 0, text_scale, text_scale, 0xffffffff);
-        //    complete_text_elapsed += dt;
-        //}
-    }
-
+void draw_end_wall(float delta) {  
     float calc_x = ((level_info.wall_x - state.camera_x));
     float calc_y =  positive_fmodf(state.camera_y, 30) + 15;  
     if (level_info.wall_y > 0) {
@@ -1342,6 +1315,11 @@ void draw_objects() {
         } else {   
             change_blending(true);
             draw_use_effects(GFX_TOP);
+            if (level_info.wall_y > 0) {
+                drawParticleSystem(&end_wall_particles, 0, 0, 1);
+                // Render rays
+                draw_rays(delta);
+            }
             draw_object_particles();
             for (int i = 0; i < 2; i++) {
                 drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
@@ -1355,7 +1333,6 @@ void draw_objects() {
             drawParticleSystem(&brick_destroy_particles, 0, 0, 1.f);
             drawParticleSystem(&coin_pickup_particles, 0, 0, 1.f);
             drawParticleSystem(&glitter_particles, 0, 0, 1.f);
-
             draw_p1_trail(&state.player, 0);
             if (!noPlayerTrail) MotionTrail_Draw(&trail_p1);
             MotionTrail_DrawWaveTrail(&wave_trail_p1);

@@ -116,7 +116,7 @@ Color get_p1_if_black(Color color);
 Color get_p2_if_black(Color color);
 void draw_objects();
 void draw_attempt_text();
-void draw_end_wall();
+void draw_end_wall(float delta);
 void draw_background(float x, float y);
 void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_width);
 void update_player_colors();
