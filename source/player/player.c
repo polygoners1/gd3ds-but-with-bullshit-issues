@@ -130,6 +130,10 @@ void cube_gamemode(Player *player) {
     // If player fell above the level, die
     if (player->y > 2794.f) state.dead = true;
 
+    if (player->snap_rotation) {
+        player->cube_target_rotation = player->rotation;
+    }
+
     // Do cube rotation
     if (player->slope_data.slope_id < 0 && !player->on_ground) {
         if (player->inverse_rotation) {
