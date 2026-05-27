@@ -26,14 +26,14 @@ char *splash_texts[] = {
     "add ground",
     "@ParticleGPT",
     "Also try Geometry Dash Advance!",
-    "I want the fart gamemode.",
+    "I want the fart gamemode",
     "2.0 when",
     "Look ma! no move triggers!",
     "99% accuracy!",
     "Six Seven!",
     "AAAAAAAAAAAAAAAAAAA",
     "Progress Alert",
-    "Jesse, the gpu and cpu ARE parallel.",
+    "Jesse, the gpu and cpu ARE parallel",
     "More games to never touch on your 3ds!",
     "You wouldnt steal a geometry dash",
     "Free and Open Source!",
@@ -42,7 +42,19 @@ char *splash_texts[] = {
     "Also try Famidash!",
     "Check out other TFDSoft projects!",
     "Dont make dumb issues. Please.",
-    "Formatting SD card..."
+    "Formatting SD card...",
+    "Is it fixed",
+    "Uh. When super famidash",
+    "Pray to the slope gods",
+    "Untangling the spaghetti...",
+    "Erm. Do i have to save the file?",
+    "Happy 2004!",
+    "Como descargar Famidash para Android en 2024",
+    "Lethal lava land",
+    "we do eht",
+    "MY GOD THE SPEED! THE SPEED!",
+    "I love GD cologne",
+
 };
 
 #define NUM_SPLASH_TEXTS (sizeof(splash_texts) / sizeof(char *))
