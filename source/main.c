@@ -793,10 +793,10 @@ void game_loop() {
                 draw_ground(state.ground_x, state.camera_y, state.camera_y - LEVEL_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
             }
 
+            change_blending(true);
             draw_use_effects(GFX_TOP_BUT_ABOVE_LEVEL);
 
             if (level_info.wall_y > 0) {
-                change_blending(true);
                 drawParticleSystem(&end_wall_firework, 0, 0, 1);
                 drawParticleSystem(&level_complete_effect_p1, 0, 0, 1);
                 drawParticleSystem(&level_complete_effect_p2, 0, 0, 1);
@@ -804,6 +804,7 @@ void game_loop() {
 
                 draw_level_complete_popup();
             }
+            change_blending(false);
 
             C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
             C2D_ViewScale(1/SCALE, 1/SCALE);
