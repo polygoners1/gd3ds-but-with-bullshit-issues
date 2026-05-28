@@ -412,8 +412,8 @@ int get_glow_channel(int obj) {
     return CHANNEL_OBJ_BLENDING;
 }
 
-int get_coin_texture(int tex) {
-    return tex + ((level_frame >> 5) & 0b11);;
+int get_coin_texture(int tex, int ticks) {
+    return tex + ((level_frame / ticks) & 0b11);;
 }
 
 // Some objects have a randomized texture at level load, get those
@@ -431,7 +431,7 @@ int get_obj_random_layer(int obj, int id) {
             return tex + (objects.random[obj] & 0b11);
         
         case SECRET_COIN:
-            return get_coin_texture(tex);
+            return get_coin_texture(tex, 26);
     }
     return -1;
 }
