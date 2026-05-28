@@ -77,13 +77,13 @@ void unpause_game() {
     in_settings = false;
 }
 
-void exit_level() {
+static void exit_level() {
     play_sfx(&quit_sound, 1);
     exiting_level = true;
     set_fade_status(FADE_STATUS_OUT);
 }
 
-void restart_level() {
+static void restart_level() {
     init_variables();
     reload_level(); 
     if (song_loaded) seek_mp3(level_info.song_offset);

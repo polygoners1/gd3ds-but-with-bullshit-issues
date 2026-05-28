@@ -8,7 +8,7 @@
 #define FIREWORK_SPAWN_TIME 2.f
 #define FIREWORK_SPAWN_DELAY 0.23f
 
-#define END_TIME 5.f
+#define MENU_TIME (FIREWORK_SPAWN_TIME + 1.5f)
 
 #define CIRCUNFERENCE_COUNT 5
 #define CIRCUNFERENCE_SPAWN_DELAY 0.05f
@@ -26,6 +26,6 @@
 #define LVL_COMPLETE_STATE_2_DURATION 0.22f
 #define LVL_COMPLETE_STATE_2_TARGET_SCALE 0.01f
 
-bool handle_wall_cutscene(float delta);
+int handle_wall_cutscene(float delta);
 void handle_level_complete_popup(float delta);
 void draw_level_complete_popup();

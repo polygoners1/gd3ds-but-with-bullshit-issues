@@ -54,6 +54,7 @@ extern float fast_speed_particles_timer;
 extern float faster_speed_particles_timer;
 
 #define SCREEN_WIDTH  400
+#define SCREEN_BOT_WIDTH  320
 #define SCREEN_HEIGHT 240
 
 enum GameState {

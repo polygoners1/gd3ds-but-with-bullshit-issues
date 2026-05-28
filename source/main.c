@@ -43,6 +43,7 @@
 #include "menus/search_menu.h"
 #include "menus/saved_levels.h"
 #include "menus/loading_screen.h"
+#include "menus/level_complete.h"
 
 #include "endwall.h"
 
@@ -757,8 +758,14 @@ void game_loop() {
 
         // Handle level being completed
         if (level_info.completing) {
-            if (handle_wall_cutscene(delta)) {
+            int status = handle_wall_cutscene(delta);
+            // Exiting
+            if (status == 1) {
                 exiting_level = true;
+                // Restarting level
+            } else if (status == 2) {
+                level_info.completing = false;
+                continue;
             }
         }  
         
@@ -812,12 +819,14 @@ void game_loop() {
             C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
             C2D_ViewScale(1/SCALE, 1/SCALE);
             gameplay_screen_top_loop();
+            draw_level_complete_top();
 
             // Bottom screen
             C2D_SceneBegin(bot);
             C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
 
             gameplay_screen_bot_loop();
+            draw_level_complete();
 
             change_blending(true);
             draw_bottom_particles();
@@ -906,6 +915,8 @@ void game_loop() {
     freeParticleData(&coin_pickup_particles.data);
 
     unload_level();
+
+    level_complete_destroy();
 
     game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
 }
