@@ -439,6 +439,8 @@ void game_loop() {
         path = main_levels[curr_level_id].gmd_path;
     }
 
+    update_player_colors();
+
     int returned = load_level(path);
     if (returned) {
         printf("\x1b[9;1HFailed %d", returned);
@@ -469,7 +471,6 @@ void game_loop() {
 
     bool being_faded = true;
 
-    update_player_colors();
     first_load_init_variables();
 
     init_op_system();
