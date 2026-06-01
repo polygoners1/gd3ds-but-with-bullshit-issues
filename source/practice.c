@@ -53,6 +53,8 @@ int checkpoint_pointer = 0;
 static const int checkpoint_size = sizeof(checkpoints);
 
 void new_checkpoint() {
+    if (state.dead) return;
+    
     // Wrap around
     if (++checkpoint_pointer >= MAX_CHECKPOINTS) checkpoint_pointer = 0;
 
