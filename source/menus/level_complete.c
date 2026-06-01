@@ -177,7 +177,7 @@ void level_complete_init() {
     // Set completion text
     completion_text = ui_get_element_by_tag(&screen_top, "funnytext");
     
-    if(state.custom_level == true){
+    if(state.custom_level == true) {
         ui_run_func_on_tag(&screen_top, "coin1", ui_disable_element);
         ui_run_func_on_tag(&screen_top, "coin2", ui_disable_element);
         ui_run_func_on_tag(&screen_top, "coin3", ui_disable_element);
@@ -189,8 +189,8 @@ void level_complete_init() {
 
         int text_index = random_int(start_index, NUM_COMPLETION_TEXTS - 1);
 
-        char *text = completion_texts[text_index];
-
+        char *text = (state.practice_mode ? practice_completion_text : completion_texts[text_index]);
+        
         ui_label_set_text(completion_text, text);
 
         float text_scale;
@@ -211,22 +211,7 @@ void level_complete_init() {
     }
 
     if (state.practice_mode) {
-        float text_scale;
-        float scale = completion_text->label.scale;
-
         ui_run_func_on_tag(&screen_top, "levelcomplete", ui_disable_element);
-        ui_label_set_text(completion_text, practice_completion_text);
-        
-        // Get text length in pixels
-        float length = get_longest_line_length(&bigFont_fontCharset, scale, practice_completion_text);
-    
-        if (COMPLETION_TEXT_MAX_WIDTH < length) {
-            text_scale = scale * (COMPLETION_TEXT_MAX_WIDTH / length);
-        } else {
-            text_scale = scale;
-        }
-
-        completion_text->label.scale = text_scale;
     } else {
         ui_run_func_on_tag(&screen_top, "practicecomplete", ui_disable_element);
     }
