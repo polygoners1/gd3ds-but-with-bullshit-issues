@@ -356,6 +356,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 flip_other_player(state.current_player);
                 player->on_ground = false;
                 player->inverse_rotation = false;
+                player->ceiling_inv_time = CEILING_INVUL_TIME;
 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &pad_use_effect, GFX_TOP);
                 if (effect) {
@@ -443,6 +444,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 player->buffering_state = BUFFER_END;
+                player->ceiling_inv_time = CEILING_INVUL_TIME;
                 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, GFX_TOP);
                 if (effect) {
