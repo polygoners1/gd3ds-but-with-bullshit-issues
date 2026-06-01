@@ -46,7 +46,7 @@ void pause_game() {
     if (state.end_wall_anim_playing) return;
 
     game_paused = true;
-    if (song_loaded) pause_playback_mp3();
+    if (song_loaded || state.practice_mode) pause_playback_mp3();
     if (!state.custom_level){
         ui_run_func_on_tag(&screen_top, "coin_1", ui_enable_element);
         ui_run_func_on_tag(&screen_top, "coin_2", ui_enable_element);
@@ -63,7 +63,7 @@ void pause_game() {
 
 void unpause_game() {
     game_paused = false;
-    if (state.death_timer <= 0 && song_loaded) {
+    if (state.death_timer <= 0 && (song_loaded || state.practice_mode)) {
         unpause_playback_mp3();
     }
     if (!state.custom_level){
@@ -125,10 +125,8 @@ static void action_open_settings(UIElement *e) {
 static void action_practice_mode(UIElement *e) {
     if (!state.practice_mode) {
         start_practice_mode();
-        ui_run_func_on_tag(&screen, "practice_buttons", ui_enable_element);
     } else {
         exit_practice_mode();
-        ui_run_func_on_tag(&screen, "practice_buttons", ui_disable_element);
     }
 
     action_unpause(e);
@@ -232,6 +230,12 @@ int gameplay_screen_bot_loop() {
     Color color = channel.color;
 
     ui_image_set_tint(bg_gradient, C2D_Color32(color.r, color.g, color.b, 255));
+
+    if (state.practice_mode) {
+        ui_run_func_on_tag(&screen, "practice_buttons", ui_enable_element);
+    } else {
+        ui_run_func_on_tag(&screen, "practice_buttons", ui_disable_element);
+    }
 
     touch.touchPosition = touchPos;
     touch.did_something = false;

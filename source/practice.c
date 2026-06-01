@@ -23,6 +23,8 @@ typedef struct CheckpointData {
     float ceiling_y;
     float ground_y_gfx;
 
+    float wall_y;
+
     bool mirroring;
     int mirror_mult;    
     float mirror_timer;
@@ -54,7 +56,7 @@ static const int checkpoint_size = sizeof(checkpoints);
 
 void new_checkpoint() {
     if (state.dead) return;
-    
+
     // Wrap around
     if (++checkpoint_pointer >= MAX_CHECKPOINTS) checkpoint_pointer = 0;
 
@@ -91,6 +93,8 @@ void new_checkpoint() {
     check->current_fading_effect = current_fading_effect;
     check->p1_trail = p1_trail;
 
+    check->wall_y = level_info.wall_y;
+
     memcpy(check->channels, channels, sizeof(channels));
     memcpy(check->col_trigger_buffer, col_trigger_buffer, sizeof(col_trigger_buffer));
 }
@@ -121,6 +125,8 @@ void restore_checkpoint() {
     state.dual_portal_y = check->dual_portal_y;
 
     state.speed = check->speed;
+
+    level_info.wall_y = check->wall_y;
 
     current_fading_effect = check->current_fading_effect;
     p1_trail = check->p1_trail;
