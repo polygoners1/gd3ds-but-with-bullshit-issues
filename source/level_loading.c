@@ -1163,6 +1163,8 @@ bool parse_string(const char *levelString) {
 
     printf("Parsing string and converting objects...\n");
     printf("Aproximately %d bytes of pure objects\n", sizeof(ObjectsArray) * objectCount);
+    
+    coin_count = 0;
 
     for (int i = 0; i < objectCount; i++) {
         // Parse
