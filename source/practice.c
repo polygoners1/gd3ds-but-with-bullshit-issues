@@ -52,7 +52,7 @@ CheckpointData checkpoints[MAX_CHECKPOINTS];
 int checkpoint_count = 0;
 int checkpoint_pointer = 0;
 
-static const int checkpoint_size = sizeof(checkpoints);
+// static const int checkpoint_size = sizeof(checkpoints);
 
 void new_checkpoint() {
     if (state.dead) return;
@@ -175,11 +175,11 @@ void handle_practice_mode() {
 
     u32 kDown = hidKeysDown();
 
-    if (kDown & KEY_L) {
+    if ((kDown & KEY_L) || (kDown & KEY_ZL)) {
         new_checkpoint();
     }
 
-    if (kDown & KEY_R) {
+    if ((kDown & KEY_R) || (kDown & KEY_ZR)) {
         delete_last_checkpoint();
     }
 }
