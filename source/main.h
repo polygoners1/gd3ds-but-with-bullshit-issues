@@ -71,6 +71,15 @@ enum GameState {
     STATE_EXIT
 };
 
+typedef enum Cheats {
+    CHEAT_NOCLIP,
+    CHEAT_HITBOX_DISPLAY,
+    CHEAT_COUNT
+} Cheats;
+
+extern bool cheats_used[CHEAT_COUNT];
+extern const char *cheat_names[CHEAT_COUNT];
+
 extern C3D_RenderTarget* top;
 extern C3D_RenderTarget* bot;
 
@@ -83,6 +92,8 @@ extern SFX explode_sound;
 extern SFX end_sound;
 
 extern int level_result;
+
+extern bool cheated;
 
 void allocate_particles();
 void free_particles();

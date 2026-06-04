@@ -245,6 +245,11 @@ void init_state() {
     state.current_data.coin1 = false;
     state.current_data.coin2 = false;
     state.current_data.coin3 = false;
+
+    cheated = false;
+    for (int i = 0; i < CHEAT_COUNT; i++) {
+        cheats_used[i] = false;
+    }
 }
 
 void init_level_bounds() {

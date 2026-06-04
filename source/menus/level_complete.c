@@ -190,7 +190,7 @@ void level_complete_init() {
     // Set completion text
     completion_text = ui_get_element_by_tag(&screen_top, "funnytext");
     
-    if(state.custom_level == true || state.practice_mode) {
+    if(state.custom_level == true || state.practice_mode || cheated) {
         ui_run_func_on_tag(&screen_top, "coin1", ui_disable_element);
         ui_run_func_on_tag(&screen_top, "coin2", ui_disable_element);
         ui_run_func_on_tag(&screen_top, "coin3", ui_disable_element);
@@ -202,7 +202,35 @@ void level_complete_init() {
 
         int text_index = random_int(start_index, NUM_COMPLETION_TEXTS - 1);
 
-        char *text = (state.practice_mode ? practice_completion_text : completion_texts[text_index]);
+        char *text = completion_texts[text_index];
+
+        char tmp[512];
+
+        if (state.practice_mode) {
+            text = practice_completion_text;
+        }
+        
+        if (cheated) {
+            char enabled_cheats[256] = "";
+            size_t len = 0;
+            
+            for (int i = 0; i < CHEAT_COUNT; i++) {
+                if (cheats_used[i]) {
+                    if (len > 0) {
+                        len += snprintf(enabled_cheats + len,
+                                        sizeof(enabled_cheats) - len,
+                                        ", ");
+                    }
+
+                    len += snprintf(enabled_cheats + len,
+                                    sizeof(enabled_cheats) - len,
+                                    "%s",
+                                    cheat_names[i]);
+                }
+            }
+            snprintf(tmp, sizeof(tmp), "Safe mode - %s", enabled_cheats);
+            text = tmp;
+        }
         
         ui_label_set_text(completion_text, text);
 

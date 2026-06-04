@@ -59,6 +59,15 @@ bool playing_menu_loop = false;
 
 int level_result = 0;
 
+bool cheated = false;
+
+bool cheats_used[CHEAT_COUNT];
+
+const char *cheat_names[CHEAT_COUNT] = {
+    "Noclip",
+    "Hitboxes"
+};
+
 PrintConsole console;
 
 C3D_RenderTarget* top;
@@ -508,13 +517,18 @@ void game_loop() {
 
         state.hitbox_display = 0;
 
-        if (kDown & KEY_X && enableDebugBindings)
+        if (kDown & KEY_X && enableDebugBindings) {
             state.noclip ^= 1;
+            cheated = true;
+            cheats_used[CHEAT_NOCLIP] = true;
+        }
 
         if ((kDown & KEY_L) && (kHeld & KEY_B) && enableDebugBindings)
             state.profiling ^= 1;
 
         if ((kDown & KEY_R) && (kHeld & KEY_B) && enableDebugBindings) {
+            cheated = true;
+            cheats_used[CHEAT_HITBOX_DISPLAY] = true;
             if (hitboxesEnabled && hitboxTrail) {
                 hitboxesEnabled = false;
                 hitboxTrail = false;
@@ -523,11 +537,18 @@ void game_loop() {
             } else hitboxesEnabled = true;
         }      
 
-        if (hitboxesEnabled || state.hitbox_enabled_when_dead) state.hitbox_display = 1;
+        if (hitboxesEnabled || state.hitbox_enabled_when_dead) {
+            state.hitbox_display = 1;
+        }
         
         if (hitboxTrail) {
             hitboxesEnabled = true;
             state.hitbox_display = 2;
+        }
+
+        if (hitboxesEnabled || hitboxTrail) {
+            cheated = true;
+            cheats_used[CHEAT_HITBOX_DISPLAY] = true;
         }
         
         int steps = 0;
@@ -638,18 +659,20 @@ void game_loop() {
             if (state.dead && state.death_timer <= 0.f) {
                 state.death_timer = (quickRetry ? 0.5f : 1.f);
                 
-                LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
-                // Save new best
-                int progress = (int)state.level_progress;
-                if (state.practice_mode) {
-                    if (state.current_data.max_practice < progress) {
-                        state.current_data.max_practice = progress;
-                        level_data_sel->practice_progress = progress;
-                    }
-                } else {
-                    if (state.current_data.max_normal < progress) {
-                        state.current_data.max_normal = progress;
-                        level_data_sel->normal_progress = progress;
+                if (!cheated) {
+                    LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+                    // Save new best
+                    int progress = (int)state.level_progress;
+                    if (state.practice_mode) {
+                        if (state.current_data.max_practice < progress) {
+                            state.current_data.max_practice = progress;
+                            level_data_sel->practice_progress = progress;
+                        }
+                    } else {
+                        if (state.current_data.max_normal < progress) {
+                            state.current_data.max_normal = progress;
+                            level_data_sel->normal_progress = progress;
+                        }
                     }
                 }
 

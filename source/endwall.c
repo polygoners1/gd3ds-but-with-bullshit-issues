@@ -47,13 +47,14 @@ static void init_level_complete_popup();
 static LevelCompletePopup level_complete_popup;
 
 int handle_wall_cutscene(float delta) {
+    bool practice_mode_end_wall = state.practice_mode || cheated;
     // Init wall variables
     if (completion_timer == 0) {
         fireworks_spawned = 0;
         circunferences_spawned = 0;
 
         // Skip rays and co
-        if (state.practice_mode) {
+        if (practice_mode_end_wall) {
             completion_timer = FIREWORK_SPAWN_TIME;
             return 0;
         }
@@ -74,7 +75,7 @@ int handle_wall_cutscene(float delta) {
     }
 
     // Make circunferences
-    if (circunference_timer >= (circunferences_spawned * CIRCUNFERENCE_SPAWN_DELAY) && circunferences_spawned < CIRCUNFERENCE_COUNT && !state.practice_mode) {        
+    if (circunference_timer >= (circunferences_spawned * CIRCUNFERENCE_SPAWN_DELAY) && circunferences_spawned < CIRCUNFERENCE_COUNT && !practice_mode_end_wall) {        
         UseEffect *effect = add_use_effect(level_info.wall_x, level_info.wall_y, USE_EFFECT_OBJ_NOTHING, &end_wall_circunference, GFX_TOP);
         if (effect) {
             Color p1_white = get_white_if_black(p1_color);
@@ -125,11 +126,11 @@ int handle_wall_cutscene(float delta) {
             spawnMultipleParticles(&level_complete_effect_p1, 200);
             spawnMultipleParticles(&level_complete_effect_p2, 200);
             
-            if (state.practice_mode) fireworks_spawned++;
+            if (practice_mode_end_wall) fireworks_spawned++;
         }
 
         // Fireworks
-        if (!state.practice_mode && completion_timer >= FIREWORK_SPAWN_TIME + (fireworks_spawned * FIREWORK_SPAWN_DELAY)) {
+        if (!practice_mode_end_wall && completion_timer >= FIREWORK_SPAWN_TIME + (fireworks_spawned * FIREWORK_SPAWN_DELAY)) {
             float calc_x = state.camera_x + 100 + random_float(0, SCREEN_WIDTH_AREA - 200);
             float y = random_float(0, SCREEN_HEIGHT_AREA);
             float calc_y = state.camera_y + (SCREEN_HEIGHT - y);
@@ -161,16 +162,18 @@ int handle_wall_cutscene(float delta) {
         // Handle level complete menu
         int status = level_complete_loop(delta);
         if (status) {
-            LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
-            if (state.practice_mode) {
-                state.current_data.max_practice = 100;
-                level_data_sel->practice_progress = 100;
-            } else {
-                state.current_data.max_normal = 100;
-                level_data_sel->normal_progress = 100;
-                level_data_sel->coin1 |= state.current_data.coin1;
-                level_data_sel->coin2 |= state.current_data.coin2;
-                level_data_sel->coin3 |= state.current_data.coin3;
+            if (!cheated) {
+                LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
+                if (state.practice_mode) {
+                    state.current_data.max_practice = 100;
+                    level_data_sel->practice_progress = 100;
+                } else {
+                    state.current_data.max_normal = 100;
+                    level_data_sel->normal_progress = 100;
+                    level_data_sel->coin1 |= state.current_data.coin1;
+                    level_data_sel->coin2 |= state.current_data.coin2;
+                    level_data_sel->coin3 |= state.current_data.coin3;
+                }
             }
             // Exiting
             if (status == 1) {
