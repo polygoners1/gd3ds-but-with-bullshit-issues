@@ -3,10 +3,10 @@
 This is a WIP Port of the popular mobile game Geometry Dash by RobTop for the Nintendo 3DS.
 
 Geometry Dash and its respective resources are by RobTop Games.
-<img width="1461" height="480" alt="imagen" src="https://github.com/user-attachments/assets/ae1c29ca-b8db-4563-af63-dffbaee8a111" />
-<img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/f237c0ce-6b62-4f48-9384-246b3db35a7a" />
-<img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/e9309ead-eac7-4030-92a0-0f9fe2f2a5f2" />
-<img width="1460" height="481" alt="imagen" src="https://github.com/user-attachments/assets/81b59cd8-18e2-48cf-921e-4942135edfd6" />
+<img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/631a3a8b-1750-4f18-b534-9b7ce75e6746" />
+<img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/d55b2434-4f4b-4136-bab8-668f5e8e62c7" />
+<img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/7f6d7c17-071d-49a3-8433-6fe2ae13fe8a" />
+<img width="1460" height="480" alt="imagen" src="https://github.com/user-attachments/assets/847299c4-023c-4a30-8dfb-d7a06cac782d" />
 
 ## Features
 - [x] Main Levels up to Theory of Everything 2
@@ -20,12 +20,12 @@ Geometry Dash and its respective resources are by RobTop Games.
 - [x] Credits Menu
 - [x] Death Animation
 - [x] Touch Screen Visual Feedback
-- [ ] Missing Visual Effects
-- [ ] Working Level Statistics
-- [ ] Icons on the Title Screen
-- [ ] Level Complete Animation
-- [ ] "New Best!" Pop-up
-- [ ] Practice Mode
+- [x] Missing Visual Effects
+- [x] Working Level Statistics
+- [x] Icons on the Title Screen
+- [x] Level Complete Animation
+- [x] "New Best!" Pop-up
+- [x] Practice Mode
 - [ ] Achievements (Maybe)
 - [ ] Online Level Search Page
 - [ ] Server Switcher (Between 1.9 GDPS and RobTop's Servers)
