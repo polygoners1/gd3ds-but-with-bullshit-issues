@@ -459,7 +459,7 @@ void main_menu_loop() {
             old_wide = wideEnabled;
         }
 
-        if (!in_settings && !in_credits && !in_statistics && !in_first_boot_disclaimer && !in_info_card) ui_screen_update(&screen, &touch);
+        if (!in_menu) ui_screen_update(&screen, &touch);
         ui_screen_update(&screen_top, &touch);
         do {
             update_touch_effect(DT);
