@@ -16,7 +16,7 @@ static void ui_label_draw(UIElement* e) {
     if (font_id >= NUM_FONTS) font_id = 0;
 
     const LabelFont *font = &fonts[font_id];
-    draw_text(font->charset, font->sheet, e->x, e->y, e->label.scale, e->label.alignment, "%s", e->label.text);
+    draw_text(font->charset, font->sheet, e->x, e->y, e->label.scale, e->label.scale, e->label.alignment, "%s", e->label.text);
 }
 
 void ui_label_set_text(UIElement *e, const char *text) {

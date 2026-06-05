@@ -327,7 +327,7 @@ float get_text_length(const Charset *font, const float zoom_x, const char *text)
 
 #define SPACING 6.f
 
-void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const float y, const float scale, float alignment, const char *text, ...) {
+void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const float y, const float scaleX, const float scaleY, float alignment, const char *text, ...) {
     if (!text || !sheet) {
         return;
     }
@@ -346,14 +346,14 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
         height = aCharacter->height * HEIGHT_OFFSET_MULT;
     }
 
-    float line_length = get_line_length(font, fabsf(scale), tmp, 0);
+    float line_length = get_line_length(font, fabsf(scaleX), tmp, 0);
 
     float offset_x = 0;
     float offset_y = 0;
 
     // Get total text height
     int line_count = count_lines(tmp) - 1;
-    float line_height = (height * scale) + SPACING * scale;
+    float line_height = (height * fabsf(scaleY)) + SPACING * fabsf(scaleY);
     float total_height = (line_count * line_height);
 
     C2D_ImageTint tint = { 0 };
@@ -373,7 +373,7 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
                     // Measure next line
                     line_length = get_line_length(
                         font,
-                        fabsf(scale),
+                        fabsf(scaleX),
                         tmp,
                         i + 1
                     );
@@ -393,25 +393,26 @@ void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const
         if (character != NULL) {
             C2D_Sprite sprite = { 0 };
 
-            float xoffset = (character->xOffset) * scale;
-            float yoffset = (character->yOffset) * scale;
-            float xadvance = character->xAdvance * scale;
+            float xoffset = (character->xOffset) * scaleX;
+            float yoffset = (character->yOffset) * scaleY;
+            float xadvance = character->xAdvance * scaleX;
 
             int index = character->spriteIndex;
             
             float base_y = y - total_height / 2.f;
             float final_x = x + offset_x + xoffset - line_length * alignment;
-            float final_y = base_y + offset_y + yoffset - height * scale;
+            float final_y = base_y + offset_y + yoffset - height * scaleY;
 
-            final_x = final_x;
-            final_y = final_y;
+            final_x += (character->width  * scaleX) * 0.5f;
+            final_y += (character->height * scaleY) * 0.5f;
 
             if (index >= 0) { 
                 // Draw glyph so its center is at (final_x, final_y)
                 C2D_SpriteFromSheet(&sprite, *sheet, index);
                 C3D_TexSetFilter(sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
+                C2D_SpriteSetCenter(&sprite, 0.5f, 0.5f);
                 C2D_SpriteSetPos(&sprite, final_x, final_y);
-                C2D_SpriteSetScale(&sprite, scale, scale);
+                C2D_SpriteSetScale(&sprite, scaleX, scaleY);
                 C2D_DrawSpriteTinted(&sprite, &tint);
             }
 

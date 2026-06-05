@@ -1,0 +1,141 @@
+#include "new_best.h"
+#include "math_helpers.h"
+#include "main.h"
+#include "state.h"
+#include "utils/gfx.h"
+#include "easing.h"
+#include "graphics.h"
+#include "save/config.h"
+
+#include "menus/components/ui_screen.h"
+#include "menus/settings.h"
+
+#include "fonts/goldFont.h"
+#include "fonts/bigFont.h"
+
+char *new_best_text[] = {
+    "Not 100%",
+    "Not GG",
+    "GGWP",
+    "Git gud nub",
+    "Skill issue",
+    "New % when",
+    "Impossible timing",
+    "Do a practice run next time",
+    "Did you reach here in the real GD?"
+    "Not 0%",
+    "Buff it",
+    "Nerf it",
+    "Level Complete... just kidding!",
+    "Its easy bro, just click",
+    "Never gonna give you up",
+    "Wrong click pattern",
+    "Cry if you want to",
+    "Please scream loudly",
+    "Just beat it!",
+    "Progress alert!",
+    "Try it in Famidash",
+    "Blame it on RobTop",
+    "Do you have muscle dementia",
+    "New worst!",
+    "Have you tried Story Madness yet?"
+};
+
+#define NUM_NEW_BEST_TEXT (sizeof(new_best_text) / sizeof(char *))
+
+typedef enum {
+    SCALE_IN,
+    WAITING,
+    SCALE_OUT,
+} NewBestState;
+
+typedef struct {
+    bool active;
+
+    int progress;
+    int text_id;
+    
+    NewBestState state;
+
+    float scale;
+
+    float initial_scale;
+    float target_scale;
+    float timer;
+    float duration;
+    EaseTypes ease;
+} NewBestPopup;
+
+static NewBestPopup new_best_popup;
+
+void init_new_best_popup(int progress) {
+    new_best_popup.active = true;
+    new_best_popup.state = SCALE_IN;
+    new_best_popup.ease = ELASTIC_OUT;
+
+    new_best_popup.text_id = random_int(0, NUM_NEW_BEST_TEXT - 1);
+    new_best_popup.progress = progress;
+
+    new_best_popup.timer = 0;
+    new_best_popup.duration = NEW_BEST_STATE_0_DURATION;
+    new_best_popup.initial_scale = 0.01;
+    new_best_popup.target_scale = NEW_BEST_STATE_0_TARGET_SCALE;
+}
+
+void handle_new_best_popup(float delta) {
+    if (new_best_popup.active) {
+        switch (new_best_popup.state) {
+            case SCALE_IN:
+                if (new_best_popup.timer > NEW_BEST_STATE_0_DURATION) {
+                    new_best_popup.state = WAITING;
+                    new_best_popup.ease = EASE_LINEAR;
+
+                    new_best_popup.timer = 0;
+                    new_best_popup.duration = NEW_BEST_STATE_1_DURATION;
+                    new_best_popup.initial_scale = new_best_popup.scale;
+                    new_best_popup.target_scale = new_best_popup.scale;
+                }
+                break;
+            case WAITING:
+                if (new_best_popup.timer > NEW_BEST_STATE_1_DURATION) {
+                    new_best_popup.state = SCALE_OUT;
+                    new_best_popup.ease = QUAD_IN;
+                    
+                    new_best_popup.timer = 0;
+                    new_best_popup.duration = NEW_BEST_STATE_2_DURATION;
+                    new_best_popup.initial_scale = new_best_popup.scale;
+                    new_best_popup.target_scale = NEW_BEST_STATE_2_TARGET_SCALE;
+                }
+                break;
+            case SCALE_OUT:
+                if (new_best_popup.timer > NEW_BEST_STATE_2_DURATION) {
+                    new_best_popup.active = false;
+                }
+                break;
+        }
+        new_best_popup.scale = easeValue(new_best_popup.ease, new_best_popup.initial_scale, new_best_popup.target_scale, new_best_popup.timer, new_best_popup.duration, 1.f);
+
+        new_best_popup.timer += delta;
+    }
+}
+
+void draw_new_best_popup() {
+    if (new_best_popup.active) {
+        float scale = new_best_popup.scale;
+
+        if (doNot) {
+            draw_text(&goldFont_fontCharset, &goldFont_sheet, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) - (NEW_BEST_SEPARATION * scale), scale, scale, 0.5f, "%s", new_best_text[new_best_popup.text_id]);
+        } else {
+            C2D_Sprite text = { 0 };
+            C2D_SpriteFromSheet(&text, ui_sheet, (NEW_BEST_IMAGE_ID));
+            C3D_TexSetFilter(text.image.tex, GPU_LINEAR, GPU_LINEAR);
+            C2D_SpriteSetCenter(&text, 0.5f, 0.5f);
+            C2D_SpriteSetPos(&text, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) - (NEW_BEST_SEPARATION * scale));
+            C2D_SpriteSetScale(&text, scale, scale);
+            C2D_DrawSprite(&text);
+        }
+
+        
+        draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH_AREA / 2, (SCREEN_HEIGHT_AREA / 2) + (NEW_BEST_SEPARATION * scale), scale, scale, 0.5f, "%d%%", new_best_popup.progress);
+    }
+}

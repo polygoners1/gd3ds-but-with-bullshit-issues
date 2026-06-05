@@ -25,6 +25,8 @@
 #include "state.h"
 #include "endwall.h"
 
+#include "menus/settings.h"
+
 #include "save/saving.h"
 
 #define ANIM_DURATION 1.f
@@ -57,7 +59,7 @@ static UIElement *coin_3;
 
 char *practice_completion_text = "Well done... Now try to complete it<p>without any checkpoints!";
 
-char *completion_texts[] = {
+char *do_not_completion_texts[] = {
     "Not 1 attempt",
     "That was kinda sloppy",
     "Well done... now beat it in the PC version",
@@ -76,7 +78,27 @@ char *completion_texts[] = {
     "we really doing anything now"
 };
 
+char *completion_texts[] = {
+    "Impressive",
+    "Awesome!",
+    "Not bad!",
+    "Well done!",
+    "Challenge Breaker!",
+    "Warp Speed!",
+    "You are... The One!",
+    "How is this possible!?",
+    "You beat me...",
+    "Reflex Master!",
+    "Skillful!",
+    "Y u do dis?",
+    "Good Job!",
+    "Incredible!",
+    "I am speechless...",
+    "Brilliant!",
+};
+
 #define NUM_COMPLETION_TEXTS (sizeof(completion_texts) / sizeof(char *))
+#define NUM_DO_NOCOMPLETION_TEXTS (sizeof(do_not_completion_texts) / sizeof(char *))
 
 
 static void exit_level_complete(UIElement* e) {
@@ -198,11 +220,11 @@ void level_complete_init() {
         int start_index = 0;
 
         // Skip the "Not 1 attempt" line
-        if (state.current_data.attempts == 1) start_index++;
+        if (doNot && state.current_data.attempts == 1) start_index++;
 
-        int text_index = random_int(start_index, NUM_COMPLETION_TEXTS - 1);
+        int text_index = random_int(start_index, (doNot ? NUM_DO_NOCOMPLETION_TEXTS : NUM_COMPLETION_TEXTS)- 1);
 
-        char *text = completion_texts[text_index];
+        char *text = (doNot ? do_not_completion_texts[text_index] : completion_texts[text_index]);
 
         char tmp[512];
 
@@ -259,8 +281,11 @@ void level_complete_init() {
 
     if (state.practice_mode) {
         ui_run_func_on_tag(&screen_top, "levelcomplete", ui_disable_element);
+
+        if (doNot) ui_get_element_by_tag(&screen_top, "practicecomplete")->image.scaleX *= -1.f;
     } else {
         ui_run_func_on_tag(&screen_top, "practicecomplete", ui_disable_element);
+        if (doNot) ui_get_element_by_tag(&screen_top, "levelcomplete")->image.scaleX *= -1.f;
     }
 }
 

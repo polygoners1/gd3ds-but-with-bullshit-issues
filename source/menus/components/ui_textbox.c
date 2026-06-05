@@ -40,7 +40,7 @@ static void ui_textbox_draw(UIElement* e) {
         txt_scale = 1.0f;
     }
 
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, e->x - e->w / 2 + (TEXTBOX_MARGIN / 2), e->y, txt_scale, 0.f, "%s", e->textbox.text);
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, e->x - e->w / 2 + (TEXTBOX_MARGIN / 2), e->y, txt_scale, txt_scale, 0.f, "%s", e->textbox.text);
 }
 
 UIElement ui_create_textbox(

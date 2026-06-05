@@ -50,6 +50,8 @@
 #include "endwall.h"
 #include "practice.h"
 
+#include "new_best.h"
+
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
 
@@ -442,7 +444,7 @@ void game_loop() {
     C2D_SceneBegin(top);
     C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
     C2D_Fade(0);
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 1.0f, "Loading...");
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, 0.5f, 0.5f, 1.0f, "Loading...");
     C3D_FrameEnd(0);
     
     char *path;
@@ -670,6 +672,7 @@ void game_loop() {
                         }
                     } else {
                         if (state.current_data.max_normal < progress) {
+                            init_new_best_popup(progress);
                             state.current_data.max_normal = progress;
                             level_data_sel->normal_progress = progress;
                         }
@@ -748,6 +751,8 @@ void game_loop() {
 
                 handle_level_complete_popup(delta);
             }
+
+            handle_new_best_popup(delta);
 
             update_collect_effect(delta);
 
@@ -900,7 +905,10 @@ void game_loop() {
 
                 draw_level_complete_popup();
             }
+
             change_blending(false);
+
+            draw_new_best_popup();
 
             C2D_ViewTranslate(0, -CAM_Y_MTX_OFFSET);
             C2D_ViewScale(1/SCALE, 1/SCALE);
@@ -925,7 +933,7 @@ void game_loop() {
                 float fps = 1 / delta;
                 if (fps > 60) fps = 60;
 
-                #define DEBUG_TEXT_SCALE 0.4f
+                #define DEBUG_TEXT_SCALE 0.4f, 0.4f
                 
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 6,  DEBUG_TEXT_SCALE, 0, "CPU: %6.2f%% (%6.2f%% %6.2f%%)", (C3D_GetProcessingTime() * 6) + processingTime, C3D_GetProcessingTime() * 6, processingTime);
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 18, DEBUG_TEXT_SCALE, 0, "GPU: %6.2f%%", drawingTime);
@@ -937,7 +945,7 @@ void game_loop() {
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 54,  DEBUG_TEXT_SCALE, 0, "Particle: %6.2f%%", particle_calc_time * 6);
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 78,  DEBUG_TEXT_SCALE, 0, "Triggers: %6.2f%%", triggers_time * 6);
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 90,  DEBUG_TEXT_SCALE, 0, "Collision %d/%d", number_of_collisions, number_of_collisions_checks);
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 102,  DEBUG_TEXT_SCALE, 0, "Physics: %6.2f%%", physics_calc_time * 6);
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 102, DEBUG_TEXT_SCALE, 0, "Physics: %6.2f%%", physics_calc_time * 6);
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 114, DEBUG_TEXT_SCALE, 0, " - Coll: %6.2f%%", collision_time * 6);
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 126, DEBUG_TEXT_SCALE, 0, " - Play: %6.2f%%", player_time * 6);
                 draw_text(&bigFont_fontCharset, &bigFont_sheet, 180, 138, DEBUG_TEXT_SCALE, 0, " - Hndl: %6.2f%%", handle_player_time * 6);
@@ -964,7 +972,7 @@ void game_loop() {
             }
 
             if (state.noclip) {
-                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0, "Noclip Activated");
+                draw_text(&bigFont_fontCharset, &bigFont_sheet, 0, 234, 0.5f, 0.5f, 0, "Noclip Activated");
             }
             C2D_ViewReset();
 
