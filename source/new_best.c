@@ -82,6 +82,10 @@ void init_new_best_popup(int progress) {
     new_best_popup.target_scale = NEW_BEST_STATE_0_TARGET_SCALE;
 }
 
+void clear_new_best_popup() {
+    new_best_popup.active = false;
+}
+
 void handle_new_best_popup(float delta) {
     if (new_best_popup.active) {
         switch (new_best_popup.state) {

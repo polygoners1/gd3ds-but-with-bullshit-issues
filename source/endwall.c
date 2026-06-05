@@ -214,6 +214,10 @@ static void init_level_complete_popup() {
     level_complete_popup.target_scale = LVL_COMPLETE_STATE_0_TARGET_SCALE;
 }
 
+void clear_level_complete_popup() {
+    level_complete_popup.active = false;
+}
+
 void handle_level_complete_popup(float delta) {
     if (level_complete_popup.active) {
         switch (level_complete_popup.state) {

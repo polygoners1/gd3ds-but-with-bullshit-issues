@@ -14,6 +14,9 @@
 #include "menus/level_select.h"
 #include "save/saving.h"
 
+#include "new_best.h"
+#include "endwall.h"
+
 GameState state;
 
 void run_camera() {
@@ -306,6 +309,7 @@ void first_load_init_variables() {
     state.camera_y = 0;
     current_fading_effect = FADE_NONE;
 
+    clear_new_best_popup();
     init_variables();
     
     LevelData *level_data_sel = (state.custom_level ? &level_data : &main_level_data[curr_level_id]);
@@ -361,6 +365,8 @@ void init_variables() {
     init_state();
 
     init_level_bounds();
+
+    clear_level_complete_popup();
 
     p1_trail = false;
 

@@ -17,3 +17,4 @@
 void init_new_best_popup();
 void handle_new_best_popup(float delta);
 void draw_new_best_popup();
+void clear_new_best_popup();

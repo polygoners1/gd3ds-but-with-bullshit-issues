@@ -28,5 +28,7 @@
 #define LVL_COMPLETE_STATE_2_TARGET_SCALE 0.01f
 
 int handle_wall_cutscene(float delta);
+
+void clear_level_complete_popup();
 void handle_level_complete_popup(float delta);
 void draw_level_complete_popup();
