@@ -10,12 +10,14 @@
 #define DATA_COIN1 "coin1"
 #define DATA_COIN2 "coin2"
 #define DATA_COIN3 "coin3"
+#define DATA_STARS "stars"
 
 typedef struct LevelData {
     int attempts;
     int jumps;
     int normal_progress;
     int practice_progress;
+    int stars;
     bool coin1;
     bool coin2;
     bool coin3;
@@ -24,6 +26,11 @@ typedef struct LevelData {
 extern LevelData level_data;
 extern LevelData main_level_data[MAIN_LEVELS_NUM];
 
+extern int total_stars;
+extern int total_coins;
+extern int total_attempts;
+extern int total_jumps;
+
 void save_level_progress();
 void load_level_progress(char *filename);
 void free_level_progress();
@@ -31,3 +38,5 @@ void free_level_progress();
 void load_main_level_progress();
 void save_main_level_progress(int level);
 void free_main_level_progress();
+
+void calculate_stats();

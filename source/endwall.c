@@ -169,7 +169,24 @@ int handle_wall_cutscene(float delta) {
                     level_data_sel->practice_progress = 100;
                 } else {
                     state.current_data.max_normal = 100;
+                    
+                    // Add totals
+                    if (level_data_sel->normal_progress < 100) {
+                        total_stars += (state.custom_level ? level_data_sel->stars : main_levels[curr_level_id].stars);
+                    }
+
+                    if (!level_data_sel->coin1 && state.current_data.coin1) {
+                        total_coins++;
+                    }
+                    if (!level_data_sel->coin2 && state.current_data.coin2) {
+                        total_coins++;
+                    }
+                    if (!level_data_sel->coin3 && state.current_data.coin3) {
+                        total_coins++;
+                    }
+                    
                     level_data_sel->normal_progress = 100;
+
                     level_data_sel->coin1 |= state.current_data.coin1;
                     level_data_sel->coin2 |= state.current_data.coin2;
                     level_data_sel->coin3 |= state.current_data.coin3;

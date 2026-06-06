@@ -999,6 +999,9 @@ void game_loop() {
     level_data_sel->normal_progress = state.current_data.max_normal;
     level_data_sel->practice_progress = state.current_data.max_practice;
 
+    total_attempts += state.current_data.attempts;
+    total_jumps += state.current_data.jumps;
+
     if (state.custom_level) {
         save_level_progress();
     } else {
@@ -1102,6 +1105,13 @@ int main(int argc, char* argv[]) {
     load_main_level_progress();
     
     loading_screen_update(25);
+
+    calculate_stats();
+
+    output_log("Stars: %d\n", total_stars);
+    output_log("Coins: %d\n", total_coins);
+    output_log("Attempts: %d\n", total_attempts);
+    output_log("Jumps: %d\n", total_jumps);
 
     cache_all_sprites();
 

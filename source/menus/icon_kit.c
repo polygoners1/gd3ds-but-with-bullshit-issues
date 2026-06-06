@@ -9,6 +9,8 @@
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_button.h"
 #include "menus/components/ui_icon.h"
+#include "menus/components/ui_label.h"
+#include "save/saving.h"
 #include "fonts/bigFont.h"
 #include "main.h"
 #include "easing.h"
@@ -251,6 +253,15 @@ void icon_kit_loop() {
     ui_image_set_tint(bg_gradient_top, C2D_Color32(167, 167, 167, 255));
 
     set_cube_page(ui_get_element_by_tag(&screen, "cube"));
+
+    char stars[32];
+    snprintf(stars, sizeof(stars), "%d", total_stars);
+    
+    char coins[32];
+    snprintf(coins, sizeof(coins), "%d", total_coins);
+
+    ui_label_set_text(ui_get_element_by_tag(&screen_top, "star_text"), stars);
+    ui_label_set_text(ui_get_element_by_tag(&screen_top, "secretcoins_text"), coins);
 
     update_player_colors();
     set_fade_status(FADE_STATUS_IN);

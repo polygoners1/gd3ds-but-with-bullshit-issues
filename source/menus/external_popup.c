@@ -218,6 +218,11 @@ static void set_stars(char *gmd) {
             stars_num = 0;
         }
 
+        if (level_data.stars != stars_num) {
+            level_data.stars = stars_num;
+            save_level_progress();
+        }
+
         free(stars);
     } else {
         stars_num = 0;
