@@ -131,6 +131,19 @@ void free_level_progress() {
     config_free(&curr_level_config);
 }
 
+int is_main_level(const char *filename) {
+    for (size_t i = 0; i < MAIN_LEVELS_NUM; i++) {
+        char file[16];
+        snprintf(file, sizeof(file), "main_%d", i);
+        char tmp[17];
+        snprintf(tmp, sizeof(tmp), "%016llX", fnv1a64(file));
+        if (strncmp(filename, tmp, 16) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void calculate_stats() {
     total_stars = 0;
     total_coins = 0;
@@ -166,16 +179,14 @@ void calculate_stats() {
         struct dirent *entry;
         while ((entry = readdir(dir)) != NULL) {
             // Skip "." and ".."
-            if (entry->d_name[0] == '.') {
-                continue;
-            }
+            if (entry->d_name[0] == '.') continue;
 
+            if (is_main_level(entry->d_name)) continue;
+            
             char path[1024];
             snprintf(path, sizeof(path), "%s%s", DATA_FOLDER, entry->d_name);
 
-            if (!config_load(&curr_level_config, path)) {
-                continue;
-            }
+            if (!config_load(&curr_level_config, path)) continue;
 
             init_default(&curr_level_config);
             init_values(&curr_level_config, &level_data);

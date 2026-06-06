@@ -40,7 +40,7 @@ static const StatisticEntries stats[] = {
     { "Completed Ext. Levels", &completed_external_levels },
     { "Completed Demon Levels", &total_demons },
     { "Collected Secret Coins", &total_coins },
-    { "Players Pestroyed", &players_destroyed }
+    { "Players Destroyed", &players_destroyed }
 
 };
 

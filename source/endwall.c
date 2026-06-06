@@ -174,7 +174,7 @@ int handle_wall_cutscene(float delta) {
                     if (level_data_sel->normal_progress < 100) {
                         int stars = 0;
                         if (state.custom_level) {
-                            completed_main_levels++;
+                            completed_external_levels++;
                             stars = level_data_sel->stars;
 
                             // Add if demon
@@ -182,7 +182,7 @@ int handle_wall_cutscene(float delta) {
                                 total_demons++;
                             }
                         } else {
-                            completed_external_levels++;
+                            completed_main_levels++;
                             stars = main_levels[curr_level_id].stars;
 
                             // Add if demon
