@@ -22,6 +22,10 @@ int total_stars = 0;
 int total_coins = 0;
 int total_attempts = 0;
 int total_jumps = 0;
+int total_demons = 0;
+int completed_main_levels = 0;
+int completed_external_levels = 0;
+int players_destroyed = 0;
 
 uint64_t fnv1a64(const char* str) {
     uint64_t hash = 14695981039346656037ULL;
@@ -117,7 +121,6 @@ void load_level_progress(char *filename) {
     config_save(&curr_level_config);
 }
 
-
 void save_level_progress() {
     save_values(&curr_level_config, &level_data);
 
@@ -133,6 +136,9 @@ void calculate_stats() {
     total_coins = 0;
     total_attempts = 0;
     total_jumps = 0;
+    total_demons = 0;
+    completed_main_levels = 0;
+    completed_external_levels = 0;
 
     // Calculate main levels
     for (int i = 0; i < MAIN_LEVELS_NUM; i++) {
@@ -141,10 +147,16 @@ void calculate_stats() {
         total_jumps += data->jumps;
 
         if (data->normal_progress == 100) {
+            completed_main_levels++;
             total_stars += main_levels[i].stars;
             total_coins += data->coin1;
             total_coins += data->coin2;
             total_coins += data->coin3;
+
+            // Check for demon
+            if (main_levels[i].difficulty == MAIN_DIFF_DEMON) {
+                total_demons++;
+            }
         }
     }
 
@@ -173,7 +185,13 @@ void calculate_stats() {
             total_jumps += data->jumps;
 
             if (data->normal_progress == 100) {
+                completed_external_levels++;
                 total_stars += data->stars;
+
+                // Check for demon
+                if (data->stars == 10) {
+                    total_demons++;
+                }
             }
         }
 

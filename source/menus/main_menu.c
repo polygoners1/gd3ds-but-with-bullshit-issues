@@ -33,6 +33,8 @@
 #include "save/config.h"
 #include "particles/circles.h"
 
+#include "save/saving.h"
+
 #define DEATH_WAITING_TIME 0.5f
 #define OFFSCREEN_BUFFER 240
 
@@ -427,6 +429,7 @@ void main_menu_loop() {
         // Ded
         if (kill && !state.dead && !in_menu) {
             state.dead = true;
+            players_destroyed++;
             handle_death(&title_screen_player, false);
             death_wait_timer = DEATH_WAITING_TIME;
         } 

@@ -98,14 +98,14 @@ void load_level_folder(char *folder) {
                 // Folder
                 char *name = strip_filename(level_name);
                 truncate_filename(name, 16);
-                texts[i] = ui_create_external_level_card(0, 0, 320, 0, name, entry->name, open_folder, NULL);
+                texts[i] = ui_create_external_level_card(0, 0, i & 1, 320, 0, name, entry->name, open_folder, NULL);
                 ui_list_add(list, &texts[i]);
             } else {
                 // File
                 strip_extension(level_name);
                 char *name = strip_filename(level_name);
                 truncate_filename(name, 16);
-                texts[i] = ui_create_external_level_card(0, 0, 420, 0, name, entry->name, open_external_popup, NULL);
+                texts[i] = ui_create_external_level_card(0, 0, i & 1, 420, 0, name, entry->name, open_external_popup, NULL);
                 ui_list_add(list, &texts[i]);
             }
         }

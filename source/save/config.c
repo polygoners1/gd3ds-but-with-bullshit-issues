@@ -13,11 +13,15 @@
 #include "menus/first_boot_disclaimer.h"
 #include "menus/soggy.h"
 
+#include "save/saving.h"
+
 Config cfg;
 
 void init_values() {
     config_init_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", false);
     config_init_bool(&cfg, CONFIG_FLAGS "sogged", false);
+    
+    config_init_int(&cfg, CONFIG_VALUES "playersDestroyed", 0);
 
     config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", false);
     config_init_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false);
@@ -70,6 +74,8 @@ void cfg_init() {
     initialDisclaimerAccepted = config_get_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", false);
     gotSogged = config_get_bool(&cfg, CONFIG_FLAGS "sogged", false);
 
+    players_destroyed = config_get_int(&cfg, CONFIG_VALUES "playersDestroyed", 0);
+
     particlesDisabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", false);
     set_wide(config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false));
     glowEnabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", true);
@@ -112,6 +118,8 @@ void cfg_init() {
 void cfg_save() {
     config_set_bool(&cfg, CONFIG_FLAGS "initialDisclaimerAccepted", initialDisclaimerAccepted);
     config_set_bool(&cfg, CONFIG_FLAGS "sogged", gotSogged);
+
+    config_set_int(&cfg, CONFIG_VALUES "playersDestroyed", players_destroyed);
 
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", particlesDisabled);
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", wideEnabled);

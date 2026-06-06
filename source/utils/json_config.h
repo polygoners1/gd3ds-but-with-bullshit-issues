@@ -9,6 +9,7 @@
 #define DATA_FOLDER CONFIG_ROOT "data/"
 
 #define CONFIG_FLAGS "flags."
+#define CONFIG_VALUES "values."
 #define CONFIG_GRAPHICS_PATH "graphics."
 #define CONFIG_INPUT_PATH "input."
 #define CONFIG_CUSTOMIZATION_PATH "custom."

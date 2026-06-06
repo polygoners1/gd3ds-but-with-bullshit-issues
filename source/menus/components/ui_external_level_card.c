@@ -74,9 +74,12 @@ static void ui_external_level_card_update(UIElement* e, UIInput* touch) {
 static void ui_external_level_card_draw(UIElement* e) {
     float left_side = e->x - e->w / 2;
     float right_side = e->x + e->w / 2;
+    float top_side = e->y - e->h / 2;
     float icon_pos = left_side + 15;
     float text_pos = icon_pos + 14;
     float button_pos = right_side - 15;
+
+    C2D_DrawRectSolid(left_side, top_side, 0, e->w, e->h, (e->external_level_card.swap_color ? C2D_Color32(50,50,50,255) :  C2D_Color32(75,75,75,255)));
 
     // Draw icon
     C2D_SpriteSetCenter(&e->external_level_card.icon.sprite, 0.5f, 0.5f);
@@ -101,7 +104,7 @@ void ui_external_level_card_set_image(UIElement *e, int sprite_index, int sheet)
     C3D_TexSetFilter(e->external_level_card.icon.sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
 }
 
-UIElement ui_create_external_level_card(int x, int y, int image, int sheet, char *text, char *level_path, UIActionFn action, char (*tag)[TAG_LENGTH]) {
+UIElement ui_create_external_level_card(int x, int y, bool swap_color, int image, int sheet, char *text, char *level_path, UIActionFn action, char (*tag)[TAG_LENGTH]) {
     UIElement e = {0};
 
     e.type = UI_EXTERNAL_LEVEL_CARD;
@@ -126,6 +129,8 @@ UIElement ui_create_external_level_card(int x, int y, int image, int sheet, char
 
     e.external_level_card.label.scale = 0.54f;
     e.external_level_card.label.alignment = 0;
+
+    e.external_level_card.swap_color = swap_color;
 
     // Button image
     C2D_SpriteFromSheet(&e.external_level_card.button.image.sprite, *get_sheet(0), 6);

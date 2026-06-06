@@ -22,6 +22,7 @@ typedef enum {
     UI_WINDOW_BUTTON,
     UI_PROGRESS_BAR,
     UI_EXTERNAL_LEVEL_CARD,
+    UI_STATISTIC_CARD,
 } UIElementType;
 
 typedef struct {
@@ -182,7 +183,14 @@ typedef struct {
     float button_w;
     float button_h;
     char path[256];
-} UIExternalLevelCard;
+    bool swap_color;
+} UIExternalLevelCardData;
+
+typedef struct {
+    UILabelData stat_name;
+    int value;
+    bool swap_color;
+} UIStatisticCardData;
 
 typedef struct UIElement UIElement;
 
@@ -227,7 +235,8 @@ struct UIElement {
         UIColorData color;
         UIWindowButtonData window_button;
         UIProgressBarData progress_bar;
-        UIExternalLevelCard external_level_card;
+        UIExternalLevelCardData external_level_card;
+        UIStatisticCardData statistic_card;
     };
 
     char tag[TAGS_PER_ELEMENT][TAG_LENGTH];

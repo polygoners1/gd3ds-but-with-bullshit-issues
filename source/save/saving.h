@@ -30,6 +30,10 @@ extern int total_stars;
 extern int total_coins;
 extern int total_attempts;
 extern int total_jumps;
+extern int total_demons;
+extern int completed_main_levels;
+extern int completed_external_levels;
+extern int players_destroyed;
 
 void save_level_progress();
 void load_level_progress(char *filename);

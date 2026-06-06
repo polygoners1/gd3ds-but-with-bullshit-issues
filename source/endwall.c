@@ -172,7 +172,26 @@ int handle_wall_cutscene(float delta) {
                     
                     // Add totals
                     if (level_data_sel->normal_progress < 100) {
-                        total_stars += (state.custom_level ? level_data_sel->stars : main_levels[curr_level_id].stars);
+                        int stars = 0;
+                        if (state.custom_level) {
+                            completed_main_levels++;
+                            stars = level_data_sel->stars;
+
+                            // Add if demon
+                            if (stars == 10) {
+                                total_demons++;
+                            }
+                        } else {
+                            completed_external_levels++;
+                            stars = main_levels[curr_level_id].stars;
+
+                            // Add if demon
+                            if (main_levels[curr_level_id].difficulty == MAIN_DIFF_DEMON) {
+                                total_demons++;
+                            }
+                        }
+
+                        total_stars += stars;
                     }
 
                     if (!level_data_sel->coin1 && state.current_data.coin1) {
