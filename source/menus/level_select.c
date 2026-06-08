@@ -340,7 +340,8 @@ void lerp_level_colors(u32 color1, u32 color2){
 void peek_right(){
     ui_run_func_on_tag(&screen, "level_card_2", enable_card_2);
 
-    int card2id = (curr_level_id + 1) % MAIN_LEVELS_NUM;
+    int card2id = curr_level_id + 1;
+    if (card2id >= MAIN_LEVELS_NUM) card2id = 0;
 
     update_level_name(card2id, 1);
     update_level_stars(card2id, 1);
@@ -354,7 +355,8 @@ void peek_right(){
 void peek_left(){
     ui_run_func_on_tag(&screen, "level_card_2", enable_card_2);
 
-    int card2id = (curr_level_id - 1) % MAIN_LEVELS_NUM;
+    int card2id = curr_level_id - 1;
+    if (card2id < 0) card2id = MAIN_LEVELS_NUM-1;
 
     update_level_name(card2id, 1);
     update_level_stars(card2id, 1);
