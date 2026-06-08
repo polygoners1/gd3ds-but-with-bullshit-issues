@@ -26,6 +26,7 @@ Geometry Dash and its respective resources are by RobTop Games.
 - [x] Level Complete Animation
 - [x] "New Best!" Pop-up
 - [x] Practice Mode
+- [x] Fart Gamemode
 - [ ] Achievements (Maybe)
 - [ ] Online Level Search Page
 - [ ] Server Switcher (Between 1.9 GDPS and RobTop's Servers)
