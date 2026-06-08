@@ -10,6 +10,7 @@
 #include "menus/components/ui_window.h"
 #include "menus/components/ui_textbox.h"
 #include "menus/components/ui_image.h"
+#include "menus/components/ui_button.h"
 #include "menus/palette_kit.h"
 #include "fonts/bigFont.h"
 #include "fonts/chatFont.h"
@@ -354,11 +355,6 @@ void main_menu_loop() {
             stop_mp3();
             break; // break in order to return to hbmenu
         }
-
-        if (kDown & KEY_START) {
-            action_open_level_select(NULL);
-        }
-
 
         state.old_input = state.input;
         state.input.pressedJump = (started) == true;

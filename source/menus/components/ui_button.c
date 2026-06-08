@@ -9,15 +9,49 @@
 #include "easing.h"
 #include "math_helpers.h"
 #include "ui_screen.h"
+#include "menus/settings.h"
 
 #include "main.h"
 
+//if a button has been pressed with a keybind, no other button should be pressed after
+static int pressedKey;
+
 static void ui_button_update(UIElement* e, UIInput* touch) {
+    //Keybinds logic
+    u32 validKeybinds = e->button.keyBinds;
+
+    if(enableDebugBindings){
+        validKeybinds &= ~(KEY_X | KEY_L | KEY_R);
+    }
+    //validKeybinds &= ~hidKeysDownRepeat();
+
+    if((hidKeysDown() & validKeybinds) > 0){
+        e->button.pressed = true;
+        e->button.hovered = true;
+        e->button.hoverTimer = 0.2f;
+        e->button.keyPressTimer = 45;
+        pressedKey = true;
+    }
+
+    if(e->button.keyPressTimer > 0){
+        if(e->button.keyPressTimer == 44){
+            pressedKey = false;
+            if (e->action){
+                e->action(e);
+            }
+        }
+        if(--(e->button.keyPressTimer) == 0){
+            e->button.pressed = false;
+            e->button.hovered = false;
+        }
+    }
+
     bool pressedTouch = hidKeysDown() & KEY_TOUCH;
     bool releasedTouch = hidKeysUp() & KEY_TOUCH;
 
     bool inside = touch->touchPosition.px >= e->x - (e->w / 2) && touch->touchPosition.px < e->x + (e->w / 2) &&
-                  touch->touchPosition.py >= e->y - (e->h / 2) && touch->touchPosition.py < e->y + (e->h / 2);
+                  touch->touchPosition.py >= e->y - (e->h / 2) && touch->touchPosition.py < e->y + (e->h / 2) && 
+                  !pressedKey;
 
     // Check if pressed the button
     if (inside && pressedTouch && !touch->did_something) {
@@ -26,27 +60,12 @@ static void ui_button_update(UIElement* e, UIInput* touch) {
     }
 
     // If previously pressed on it, hover
-    if (inside && e->button.pressed) {
+    if (inside) {
         e->button.hovered = true;
     }
     
-    EaseTypes bounce_type;
-    // Animation
-    if (e->button.hovered) {
-        e->button.hoverTimer += DT;
-        bounce_type = BOUNCE_OUT;
-    } else {
-        e->button.hoverTimer -= DT;
-        // As the animation plays in reverse, we just use bounce in
-        bounce_type = BOUNCE_IN;
-    }
-
-    e->button.hoverTimer = clampf(e->button.hoverTimer, 0.f, BUTTON_HOVER_ANIM_TIME);
-    e->button.hoverScale = easeValue(bounce_type, 1.0f, BUTTON_HOVER_SCALE, e->button.hoverTimer, BUTTON_HOVER_ANIM_TIME, 0);
-
-
     // If released on button, do its action
-    if (e->button.hovered && releasedTouch) {
+    if (e->button.hovered && releasedTouch && !pressedKey) {
         e->button.pressed = false;
         e->button.hovered = false;
         e->button.hoverTimer = 0.f;
@@ -59,7 +78,7 @@ static void ui_button_update(UIElement* e, UIInput* touch) {
     if (!inside) {
         e->button.hovered = false;
     }
-    
+
     // Mask background elements
     if (inside) {
         touch->interacted = true;
@@ -68,6 +87,20 @@ static void ui_button_update(UIElement* e, UIInput* touch) {
 }
 
 static void ui_button_draw(UIElement* e) {
+    EaseTypes bounce_type;
+    // Animation
+    if (e->button.hovered) {
+        e->button.hoverTimer += DT * (e->button.keyPressTimer > 0 ? 2 : 1);
+        bounce_type = (e->button.keyPressTimer > 0 ? EASE_OUT : BOUNCE_OUT);
+    } else {
+        e->button.hoverTimer -= DT;
+        // As the animation plays in reverse, we just use bounce in
+        bounce_type = BOUNCE_IN;
+    }
+
+    e->button.hoverTimer = clampf(e->button.hoverTimer, 0.f, BUTTON_HOVER_ANIM_TIME);
+    e->button.hoverScale = easeValue(bounce_type, 1.0f, BUTTON_HOVER_SCALE, e->button.hoverTimer, BUTTON_HOVER_ANIM_TIME, 0);
+
     int font_id = e->button.font;
 
     // Set to pusab if invalid
@@ -118,7 +151,8 @@ UIElement ui_create_button(
     char *text,
     int font,
     char (*tag)[TAG_LENGTH],
-    float textScale
+    float textScale,
+    u32 keyBinds
 ) {
     UIElement e = {
         .type = UI_BUTTON,
@@ -146,6 +180,10 @@ UIElement ui_create_button(
 
     e.button.font = font;
     e.button.textScale = textScale;
+
+    e.button.keyBinds = keyBinds;
+
+    pressedKey = false;
 
     return e;
 }

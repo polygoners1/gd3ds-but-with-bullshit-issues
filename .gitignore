@@ -87,3 +87,4 @@ fabric.properties
 
 # Debug files
 *.dSYM/
+.gitignore
