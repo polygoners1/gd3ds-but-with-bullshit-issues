@@ -394,6 +394,7 @@ void level_select_loop() {
     start_level = false;
     exit_flag = false;
     state.custom_level = false;
+    dragDistance = 0;
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/level_select.txt");
     ui_load_screen(&screen_top, actions_top, sizeof(actions_top) / sizeof(actions_top[0]), "romfs:/menus/level_select_top.txt");
 
